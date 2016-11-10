@@ -77,7 +77,7 @@ def pipeline(args, logger):
     keep_logging('START: Mapping Reads using BWA', 'START: Mapping Reads using BWA', logger, 'info')
     split_field = prepare_readgroup(args.forward_raw, logger)
     files_to_delete = []
-    out_sam = align(args.bam_input, args.output_folder, args.index, split_field, args.analysis_name, files_to_delete, logger, Config)
+    out_sam = align(args.bam_input, args.output_folder, args.index, split_field, args.analysis_name, files_to_delete, logger, Config, args.type)
     keep_logging('END: Mapping Reads using BWA', 'END: Mapping Reads using BWA', logger, 'info')
 
 

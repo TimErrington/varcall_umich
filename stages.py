@@ -55,7 +55,7 @@ def trimmomatic(input1, input2, out_path, crop, logger, Config):
 ################################################################################### End #################################################################################################################################
 
 ################################################################################### bwa, smalt, bowtie: Alignment #######################################################################################################
-def align(bam_input, out_path, ref_index, split_field, analysis, files_to_delete, logger, Config):
+def align(bam_input, out_path, ref_index, split_field, analysis, files_to_delete, logger, Config, type):
     reference = ConfigSectionMap(ref_index, Config)['ref_path'] + "/" + ConfigSectionMap(ref_index, Config)['ref_name']
     forward_clean = out_path + "/" + ConfigSectionMap("Trimmomatic", Config)['f_p']
     reverse_clean = out_path + "/" + ConfigSectionMap("Trimmomatic", Config)['r_p']
@@ -71,7 +71,7 @@ def align(bam_input, out_path, ref_index, split_field, analysis, files_to_delete
                 #throw error
                 print "error"
         else:
-            out_file = align_bwa(base_cmd,forward_clean, reverse_clean, out_path, reference, split_field, analysis, files_to_delete, logger, Config)
+            out_file = align_bwa(base_cmd,forward_clean, reverse_clean, out_path, reference, split_field, analysis, files_to_delete, logger, Config, type)
             return out_file
     elif aligner == "smalt":
         print "Smalt addition pending"
