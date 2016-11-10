@@ -60,3 +60,8 @@ The pipeline generates various output files from different tools at different st
 >3. analysisname_depth_of_coverage*: Depth of Coverage generated using GATK Depth of Coverage.
 >4. analysisname_markduplicates_metrics: Mark Duplicates metrics generated during Picard Mark Duplicates step.
 >5. analysisname_report.pdf and genome_results.txt: generated using Qualimap bamQC.
+
+**Log:**
+
+The pipeline generates a log file following the naming convention: yyyy_mm_dd_hrs_mins_secs_analysisname.log.txt
+Each and every step of the pipeline is logged into the log file and the log file sections follows the standard Python log naming conventions: INFO to print STDOUT messages, DEBUG to print commands ran by pipeline, ERROR to print STDERR messages and EXCEPTION to print an exception that occured while the pipeline was running.
