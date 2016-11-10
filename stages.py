@@ -16,7 +16,7 @@ from remove_5_bp_snp_indel import *
 from qualimap import *
 
 
-################################################################# Prepare ReadGroup option for BWA alignment ############################################################################################################
+## Prepare ReadGroup option for BWA alignment ##
 def prepare_readgroup(forward_read, logger):
     keep_logging('Preparing ReadGroup Info', 'Preparing ReadGroup Info', logger, 'info')
     samplename = os.path.basename(forward_read)
@@ -46,15 +46,15 @@ def prepare_readgroup(forward_read, logger):
         split_field = re.split(r":",firstLine)
         split_field = "\"" + "@RG" + "\\tID:" + split_field[1] + "\\tSM:" + samplename + "\\tLB:1\\tPL:Illumina" + "\""
         return split_field
-################################################################################### End #################################################################################################################################
+## End ##
 
 
-####################################################################### Raw data Pre-processing using Trimmomatic #######################################################################################################
+## Raw data Pre-processing using Trimmomatic ##
 def trimmomatic(input1, input2, out_path, crop, logger, Config):
     trim(input1, input2, out_path, crop, logger, Config)
-################################################################################### End #################################################################################################################################
+## End ##
 
-################################################################################### bwa, smalt, bowtie: Alignment #######################################################################################################
+## bwa, smalt, bowtie: Alignment ##
 def align(bam_input, out_path, ref_index, split_field, analysis, files_to_delete, logger, Config, type):
     reference = ConfigSectionMap(ref_index, Config)['ref_path'] + "/" + ConfigSectionMap(ref_index, Config)['ref_name']
     forward_clean = out_path + "/" + ConfigSectionMap("Trimmomatic", Config)['f_p']
@@ -81,9 +81,9 @@ def align(bam_input, out_path, ref_index, split_field, analysis, files_to_delete
         print "bowtie addition pending"
         exit()
         usage()
-################################################################################### End #################################################################################################################################
+## End ##
 
-############################################################### samtools: Post-Alignment SAM/BAM conversion, sort, index ################################################################################################
+## samtools: Post-Alignment SAM/BAM conversion, sort, index ##
 def prepare_bam(out_sam, out_path, analysis, files_to_delete, logger, Config):
     out_bam = samtobam(out_sam, out_path, analysis, files_to_delete, logger, Config)
     out_sort_bam = sort_bam(out_bam, out_path, analysis, logger, Config)
@@ -96,9 +96,9 @@ def prepare_bam(out_sam, out_path, analysis, files_to_delete, logger, Config):
         exit()
     else:
         return out_sort_bam
-################################################################################### End #################################################################################################################################
+## End ##
 
-############################################################### samtools, gatk: Variant calling #########################################################################################################################
+## samtools, gatk: Variant calling ##
 def variant_calling(out_finalbam, out_path, index, analysis, logger, Config):
     variant_caller = eval(ConfigSectionMap("pipeline", Config)['variant_caller'])
     final_raw_vcf = variant_caller(out_finalbam, out_path, index, analysis, logger, Config)
@@ -107,9 +107,9 @@ def variant_calling(out_finalbam, out_path, index, analysis, logger, Config):
         exit()
     else:
         return final_raw_vcf
-################################################################################### End #################################################################################################################################
+## End ##
 
-############################################################### Statistics Report #######################################################################################################################################
+## Statistics Report ##
 def alignment_stats(out_sorted_bam, out_path, analysis, logger, Config):
     alignment_stats_file = flagstat(out_sorted_bam, out_path, analysis, logger, Config)
     keep_logging('The Alignments Stats file from Samtools: {}'.format(alignment_stats_file), 'The Alignments Stats file from Samtools: {}'.format(alignment_stats_file), logger, 'debug')
@@ -122,9 +122,9 @@ def vcf_stats(final_raw_vcf, out_path, analysis, logger, Config):
 def qualimap(out_sorted_bam, out_path, analysis, logger, Config):
     qualimap_report = bamqc(out_sorted_bam, out_path, analysis, logger, Config)
     return qualimap_report
-######################################################################## END ##############################################################################################################################################
+## END ##
 
-############################################################### Variant Filteration #######################################################################################################################################
+## Variant Filteration ##
 def filter2_variants(final_raw_vcf, out_path, analysis, ref_index, logger, Config):
     reference = ConfigSectionMap(ref_index, Config)['ref_path'] + "/" + ConfigSectionMap(ref_index, Config)['ref_name']
     gatk_filter2_final_vcf_file = gatk_filter2(final_raw_vcf, out_path, analysis, reference, logger, Config)
@@ -138,15 +138,15 @@ def filter2_variants(final_raw_vcf, out_path, analysis, ref_index, logger, Confi
     keep_logging('The final Consensus Fasta file with no proximate: {}'.format(gatk_vcf2fasta_filter2_file_no_proximate), 'The final Consensus Fasta file with no proximate: {}'.format(gatk_vcf2fasta_filter2_file_no_proximate), logger, 'debug')
     keep_logging('The final Consensus Fasta file from VCF-consensus: {}'.format(vcftools_vcf2fasta_filter2_file), 'The final Consensus Fasta file from VCF-consensus: {}'.format(vcftools_vcf2fasta_filter2_file), logger, 'debug')
     keep_logging('The final Consensus Fasta file from VCF-consensus with no proximate: {}'.format(vcftools_vcf2fasta_filter2_file_no_proximate), 'The final Consensus Fasta file from VCF-consensus with no proximate: {}'.format(vcftools_vcf2fasta_filter2_file_no_proximate), logger, 'debug')
-######################################################################## END ##############################################################################################################################################
+## END ##
 
-############################################################### Generate different VCF's ###################################################################################################################################
+## Generate different VCF's ##
 def raw_only_snp_vcf(final_raw_vcf, out_path, analysis, ref_index):
     print "\n################## Generating different VCF ##################\n"
     reference = ConfigSectionMap(ref_index)['ref_path'] + "/" + ConfigSectionMap(ref_index)['ref_name']
     only_snp_raw_vcf_file = only_snp_raw_vcf(final_raw_vcf, out_path, analysis, reference)
     print "\nThe final raw vcf file(only SNP): %s" % only_snp_raw_vcf_file
-############################################################### End: Generate different VCF's ###############################################################################################################################
+## End: Generate different VCF's ##
 
 
 
@@ -154,7 +154,7 @@ def raw_only_snp_vcf(final_raw_vcf, out_path, analysis, ref_index):
 
 
 ## Unused
-############################################################### Variant Filteration #######################################################################################################################################
+## Variant Filteration ##
 def filter1_variants(final_raw_vcf, out_path, analysis, ref_index):
     reference = ConfigSectionMap(ref_index)['ref_path'] + "/" + ConfigSectionMap(ref_index)['ref_name']
     gatk_filter1_final_vcf_file = gatk_filter1(final_raw_vcf, out_path, analysis, reference)
@@ -170,15 +170,15 @@ def filter1_variants(final_raw_vcf, out_path, analysis, ref_index):
     print "\nThe final Consensus Fasta file from VCF-consensus: %s" % vcftools_vcf2fasta_filter1_file
     print "\nThe final Consensus Fasta file from VCF-consensus with no proximate snps: %s" % vcftools_vcf2fasta_filter1_file_no_proximate
 
-############################################################### Remove SAM files ##########################################################################################################################################
+## Remove SAM files ##
 def remove_files(analysis, out_path, out_sam, out_sorted_bam):
     os.remove(out_sam)
     if os.path.isfile(out_sorted_bam):
         raw_bam_file = "%s/%s_aln.bam" % (out_path, analysis)
         os.remove(raw_bam_file)
-###################################################################### END ################################################################################################################################################
+## END ##
 
-############################################################### picard, gatk: Mark Duplicates; Indel Realignment ########################################################################################################
+## picard, gatk: Mark Duplicates; Indel Realignment ##
 def post_align_bam(out_sorted_bam, out_path, reference, analysis):
     print "\n################## Picard, GATK: Mark Duplicates; Indel Realignment. ##################\n"
     out_marked_bam = markduplicates(out_sorted_bam, out_path, analysis)
@@ -199,7 +199,7 @@ def post_align_bam(out_sorted_bam, out_path, reference, analysis):
     else:
         print "\n################## END: Picard, GATK: Mark Duplicates; Indel Realignment. #############\n"
         return out_indel_realign_bam
-################################################################################### End #################################################################################################################################
+## End ##
 
 
 
