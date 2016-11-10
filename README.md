@@ -39,3 +39,24 @@ variant_caller: samtools
 Currently, The pipeline supports BWA aligner(mem algorithm) for aligning reads to the reference genome and samtools for variant calling.
 
 Parameters for each tools can be customised under the 'tool_parameter' attribute of each tool in config file.
+
+**Output**:
+
+The pipeline generates various output files from different tools at different steps. The most notable ones are:
+- Clean reads: *.fq.gz files from trimmomatic.
+
+- Alignemnet files: analysisname_aln.sam and analysisname_aln.bam from BWA, analysisname_aln_marked.bam from GATK MarkDuplicates, and finally a sorted BAM from marked bam file analysisname_aln_sort.bam. Also including *bai index files.
+- Bed file: analysisname_unmapped.bed and analysisname_unmapped.bed_positions with positions that were unmapped. Bedcoverage file analysisname_.bedcov
+
+- VCF file: Various vcf files are generated removing different types of variants at different steps.
+>1. analysisname_aln_mpileup_raw.vcf: The raw variant calls without any variant filtering
+>2. analysisname_aln_mpileup_raw.vcf_5bp_indel_removed.vcf.gz: variants that proximate to an indel by 5 bp are filtered out
+>3. analysisname_filter2_gatk.vcf: variants filtered out using GATK variant filter parameters(parameters can be changed in config file) + variants that are proximate to an indel by 5 bp are filtered out
+>4. analysisname_final.vcf_no_proximate_snp.vcf.gz: variants filtered out using GATK variant filter parameters(parameters can be changed in config file) + variants that are proximate to an indel by 5 bp are filtered out + variants that are proximate to each other by 5 bp 
+
+- Statistics Reports:
+>1. analysisname_alignment_stats: Alignment stats file generated using SAMTOOLS flagstat.
+>2. analysisname_vcf_stats: vcf stats(raw) generated using vcftools
+>3. analysisname_depth_of_coverage*: Depth of Coverage generated using GATK Depth of Coverage.
+>4. analysisname_markduplicates_metrics: Mark Duplicates metrics generated during Picard Mark Duplicates step.
+>5. analysisname_report.pdf and genome_results.txt: generated using Qualimap bamQC.
