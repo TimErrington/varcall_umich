@@ -66,7 +66,7 @@ The pipeline generates various output files from different tools at different st
 >2. ***analysisname_vcf_stats***: vcf stats(raw) generated using vcftools
 >3. ***analysisname_depth_of_coverage***: Depth of Coverage generated using GATK Depth of Coverage.
 >4. ***analysisname_markduplicates_metrics***: Mark Duplicates metrics generated during Picard Mark Duplicates step.
->5. ***analysisname_report.pdf*** and ***genome_results.txt***: generated using Qualimap bamQC.
+>5. ***analysisname_report.pdf*** and ***genome_results.txt***: generated using [Qualimap bamQC](http://qualimap.bioinfo.cipf.es/).
 
 **Log:**
 ***
