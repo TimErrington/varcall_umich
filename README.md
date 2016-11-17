@@ -50,7 +50,7 @@ Parameters for each tools can be customised under the 'tool_parameter' attribute
 The pipeline generates various output files from different tools at different steps. The most notable ones are:
 - ***Clean reads***: *.fq.gz files from trimmomatic.
 
-- ***Alignemnet files***: analysisname_aln.sam and analysisname_aln.bam from BWA, analysisname_aln_marked.bam from GATK MarkDuplicates, and finally a sorted BAM from marked bam file analysisname_aln_sort.bam. Also including *bai index files.
+- ***Alignment files***: analysisname_aln.sam and analysisname_aln.bam from BWA, analysisname_aln_marked.bam from GATK MarkDuplicates, and finally a sorted BAM from marked bam file analysisname_aln_sort.bam. Also including *bai index files.
 - ***Bed file***: analysisname_unmapped.bed and analysisname_unmapped.bed_positions with positions that were unmapped. Bedcoverage file analysisname_.bedcov
 
 - ***VCF file***: Various vcf files are generated removing different types of variants at different steps.
