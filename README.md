@@ -70,7 +70,6 @@ The pipeline generates various output files from different tools at different st
 
 - ***Statistics Reports***:
 ***
-
 >1. ***analysisname_alignment_stats***: Alignment stats file generated using SAMTOOLS flagstat.
 >2. ***analysisname_vcf_stats***: vcf stats(raw) generated using vcftools
 >3. ***analysisname_depth_of_coverage***: Depth of Coverage generated using GATK Depth of Coverage.
