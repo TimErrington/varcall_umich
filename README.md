@@ -38,7 +38,16 @@ The pipeline implements customisable variant calling configurations using config
 aligner: bwa
 # Options for variant_caller:  gatkhaplotypecaller /samtools
 variant_caller: samtools
+
+# Set bin folder path. 
+[bin_path]
+#binbase: /scratch/micro612w16_fluxod/shared/bin/
+binbase: /home/apirani/bin/
 ```
+
+Make sure all the executablesdependencies are placed in bin folder supplies with binbase under section [bin_path]. 
+NOTE: Add the required perl libraries(such as in the case of vcftools) PERL5LIB environment variable. 
+
 
 Currently, The pipeline supports BWA aligner(mem algorithm) for aligning reads to the reference genome and samtools for variant calling.
 
