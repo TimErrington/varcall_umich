@@ -59,7 +59,7 @@ The pipeline generates various output files from different tools at different st
 >3. ***analysisname_filter2_gatk.vcf***: variants that does not pass the GATK variant filter parameters are filtered out(parameters can be changed in config file) + variants that are proximate to an indel by 5 bp are filtered out
 >4. ***analysisname_final.vcf_no_proximate_snp.vcf.gz***: variants that does not pass the GATK variant filter parameters are filtered out(parameters can be changed in config file) + variants that are proximate to an indel by 5 bp are filtered out + variants that are proximate to each other by 5 bp 
 
-- Statistics Reports:
+- ***Statistics Reports***:
 ***
 
 >1. ***analysisname_alignment_stats***: Alignment stats file generated using SAMTOOLS flagstat.
