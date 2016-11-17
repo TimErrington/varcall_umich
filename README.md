@@ -19,10 +19,10 @@ python pipeline.py [-h] -PE1 path-to-forward-PE-read -PE2 path-to-reverse-PE-rea
 **Note:**
 ***
 
-- Input file format and extension: Either .fastq or .fastq.gz
-- Output Directory: Pipeline creates output folder by output directory name mentioned at the end of the path. e.g: -o /any-path-followed-by/output_directory-name/
-- ANALYSIS_NAME: Name by which pipeline saves the results inside output directory. e.g: -analysis first_analysis
-- INDEX: Reference Index Name as mentioned under the section 'Reference Genome to be used for pipeline'. 
+- ***Input file format and extension***: Either .fastq or .fastq.gz
+- ***Output Directory***: Pipeline creates output folder by output directory name mentioned at the end of the path. e.g: -o /any-path-followed-by/output_directory-name/
+- ***ANALYSIS_NAME***: Name by which pipeline saves the results inside output directory. e.g: -analysis first_analysis
+- ***INDEX***: Reference Index Name as mentioned under the section 'Reference Genome to be used for pipeline'. 
   e.g: In config file; under the section [KPNIH1], mention the attributes REF_NAME and REF_PATH for reference fasta filename and path to the reference fasta file resp. The section name KPNIH1 is required by the INDEX argument.
 - config: Path to your customized config file. Make sure the section names are similar to the default config file.
 
@@ -51,13 +51,13 @@ The pipeline generates various output files from different tools at different st
 - ***Clean reads***: *.fq.gz files from trimmomatic.
 
 - ***Alignemnet files***: analysisname_aln.sam and analysisname_aln.bam from BWA, analysisname_aln_marked.bam from GATK MarkDuplicates, and finally a sorted BAM from marked bam file analysisname_aln_sort.bam. Also including *bai index files.
-- Bed file: analysisname_unmapped.bed and analysisname_unmapped.bed_positions with positions that were unmapped. Bedcoverage file analysisname_.bedcov
+- ***Bed file***: analysisname_unmapped.bed and analysisname_unmapped.bed_positions with positions that were unmapped. Bedcoverage file analysisname_.bedcov
 
 - ***VCF file***: Various vcf files are generated removing different types of variants at different steps.
->1. analysisname_aln_mpileup_raw.vcf: The raw variant calls without any variant filtering
->2. analysisname_aln_mpileup_raw.vcf_5bp_indel_removed.vcf.gz: variants that proximate to an indel by 5 bp are filtered out
->3. analysisname_filter2_gatk.vcf: variants that does not pass the GATK variant filter parameters are filtered out(parameters can be changed in config file) + variants that are proximate to an indel by 5 bp are filtered out
->4. analysisname_final.vcf_no_proximate_snp.vcf.gz: variants that does not pass the GATK variant filter parameters are filtered out(parameters can be changed in config file) + variants that are proximate to an indel by 5 bp are filtered out + variants that are proximate to each other by 5 bp 
+>1. ***analysisname_aln_mpileup_raw.vcf***: The raw variant calls without any variant filtering
+>2. ***analysisname_aln_mpileup_raw.vcf_5bp_indel_removed.vcf.gz***: variants that proximate to an indel by 5 bp are filtered out
+>3. ***analysisname_filter2_gatk.vcf***: variants that does not pass the GATK variant filter parameters are filtered out(parameters can be changed in config file) + variants that are proximate to an indel by 5 bp are filtered out
+>4. ***analysisname_final.vcf_no_proximate_snp.vcf.gz***: variants that does not pass the GATK variant filter parameters are filtered out(parameters can be changed in config file) + variants that are proximate to an indel by 5 bp are filtered out + variants that are proximate to each other by 5 bp 
 
 - Statistics Reports:
 ***
