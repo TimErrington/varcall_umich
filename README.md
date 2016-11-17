@@ -72,4 +72,4 @@ The pipeline generates various output files from different tools at different st
 ***
 
 The pipeline generates a log file following the naming convention: yyyy_mm_dd_hrs_mins_secs_analysisname.log.txt and tracks each event/command run by the pipleine. The log file sections follow the standard Python logging conventions: 
-***INFO*** to print STDOUT messages; ***DEBUG*** to print commands ran by pipeline, ***ERROR*** to print STDERR messages and EXCEPTION to print an exception that occured while the pipeline was running.
+***INFO*** to print STDOUT messages; ***DEBUG*** to print commands ran by pipeline, ***ERROR*** to print STDERR messages and ***EXCEPTION*** to print an exception that occured while the pipeline was running.
