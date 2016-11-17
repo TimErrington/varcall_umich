@@ -3,11 +3,11 @@
 ## The pipeline runs sequentially as follows:
 ***
 
->1. Pre-Processing Raw reads using Trimmomatic
->2. Read Alignment using BWA
->3. Post-Alignment steps using SAMTOOLS, GATK, PICARD, Bedtools etc
->4. Variant Calling using SAMTOOLS
->5. Variant Filtering and generating Consensus using GATK, Bedtools, vcftools, in-house scripts etc.
+>1. Pre-Processing Raw reads using [Trimmomatic](http://www.usadellab.org/cms/?page=trimmomatic)
+>2. Read Alignment using [BWA](http://bio-bwa.sourceforge.net/)
+>3. Post-Alignment steps using [SAMTOOLS], [GATK](https://software.broadinstitute.org/gatk/), [PICARD](https://broadinstitute.github.io/picard/), [Bedtools]() etc
+>4. Variant Calling using [SAMTOOLS](http://samtools.sourceforge.net/)
+>5. Variant Filtering and generating Consensus using [GATK](https://software.broadinstitute.org/gatk/), [Bedtools](http://bedtools.readthedocs.io/en/latest/), [vcftools](http://vcftools.sourceforge.net/), in-house scripts() etc.
 
 
 **Usage:**
@@ -71,5 +71,5 @@ The pipeline generates various output files from different tools at different st
 **Log:**
 ***
 
-The pipeline generates a log file following the naming convention: yyyy_mm_dd_hrs_mins_secs_analysisname.log.txt and tracks each event/command run by the pipleine. The log file sections follow the standard Python logging conventions: 
+The pipeline generates a log file following the naming convention: yyyy_mm_dd_hrs_mins_secs_analysisname.log.txt and tracks each event/command run by the pipleine. The log file sections follow the standard [Python logging conventions](https://docs.python.org/2/howto/logging.html): 
 ***INFO*** to print STDOUT messages; ***DEBUG*** to print commands ran by pipeline, ***ERROR*** to print STDERR messages and ***EXCEPTION*** to print an exception that occured while the pipeline was running.
