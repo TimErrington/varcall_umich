@@ -1,7 +1,7 @@
 __author__ = 'alipirani'
 import os
-from log_modules import keep_logging
-from logging_subprocess import *
+from modules.log_modules import keep_logging
+from modules.logging_subprocess import *
 from config_settings import ConfigSectionMap
 
 
@@ -12,7 +12,7 @@ def samtobam(out_sam, out_path, analysis, files_to_delete, logger, Config):
     keep_logging('SAM to BAM Conversion', 'SAM to BAM Conversion', logger, 'info')
     keep_logging(cmd, cmd, logger, 'debug')
     try:
-        #call(cmd, logger)
+        call(cmd, logger)
         print ""
     except sp.CalledProcessError:
         keep_logging('Error in SAM-to-BAM Conversion step. Exiting.', 'Error in SAM-to-BAM Conversion step. Exiting.', logger, 'exception')

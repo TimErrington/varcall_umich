@@ -1,19 +1,19 @@
 __author__ = 'alipirani'
 
 #from config_settings import ConfigSectionMap
-from check_subroutines import *
-from trim import *
+#from check_subroutines import *
+from modules.trim import *
 import os
 import gzip
 import re
-from log_modules import keep_logging
-from bwa import align_bwa
-from samtools import *
-from picard import *
-from gatk import *
-from vcftools import *
-from remove_5_bp_snp_indel import *
-from qualimap import *
+from modules.log_modules import keep_logging
+from modules.bwa import align_bwa
+from modules.samtools import *
+from modules.picard import *
+from modules.gatk import *
+from modules.vcftools import *
+from modules.remove_5_bp_snp_indel import *
+from modules.qualimap import *
 
 
 ## Prepare ReadGroup option for BWA alignment ##

@@ -4,8 +4,8 @@ import argparse
 import errno
 from config_settings import ConfigSectionMap
 import csv
-from logging_subprocess import *
-from log_modules import *
+from modules.logging_subprocess import *
+from modules.log_modules import *
 
 
 indel_positions = []

@@ -2,8 +2,8 @@ __author__ = 'alipirani'
 import os
 from config_settings import ConfigSectionMap
 from sys import platform as _platform
-from log_modules import keep_logging
-from logging_subprocess import *
+from modules.log_modules import keep_logging
+from modules.logging_subprocess import *
 
 def vcfstats(final_raw_vcf, out_path, analysis):
     base_tabix = ConfigSectionMap("bin_path", Config)['binbase'] + "/" + ConfigSectionMap("vcftools", Config)['tabix_bin']

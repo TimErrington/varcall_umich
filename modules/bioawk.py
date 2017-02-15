@@ -2,8 +2,8 @@ __author__ = 'alipirani'
 
 import os
 from config_settings import ConfigSectionMap
-from logging_subprocess import *
-from log_modules import *
+from modules.logging_subprocess import *
+from modules.log_modules import *
 
 def bioawk_make_reference_size(reference, logger, Config):
     base_cmd = ConfigSectionMap("bin_path", Config)['binbase'] + "/" + ConfigSectionMap("bioawk", Config)['bioawk_bin'] + "/" + ConfigSectionMap("bioawk", Config)['base_cmd']

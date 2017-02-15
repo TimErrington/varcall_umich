@@ -2,9 +2,9 @@ __author__ = 'alipirani'
 
 import os
 from config_settings import ConfigSectionMap
-from bioawk import *
-from logging_subprocess import *
-from log_modules import *
+from modules.bioawk import *
+from modules.logging_subprocess import *
+from modules.log_modules import *
 
 
 def bedtools(out_sorted_bam, out_path, analysis, logger, Config):

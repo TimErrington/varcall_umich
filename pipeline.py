@@ -12,12 +12,12 @@ if sys.version_info < (3, 2):
     import subprocess32 as sp
 else:
     import subprocess as sp
-from stages import *
-from remove_5_bp_snp_indel import *
-from bedtools import *
-from gatk import gatk_DepthOfCoverage
-from logging_subprocess import *
-from log_modules import *
+from modules.stages import *
+from modules.remove_5_bp_snp_indel import *
+from modules.bedtools import *
+from modules.gatk import gatk_DepthOfCoverage
+from modules.logging_subprocess import *
+from modules.log_modules import *
 
 
 # Command Line Argument Parsing
@@ -32,6 +32,7 @@ def parser():
     required.add_argument('-o', action='store', dest="output_folder", help='Output Path ending with output directory name to save the results', required=True)
     required.add_argument('-analysis', action='store', dest="analysis_name", help='Unique analysis name to save the results', required=True)
     required.add_argument('-index', action='store', dest="index", help='Reference Index Name. Change this argument in config file and mention the reference header name such as KP_NTUH_chr/KPNIH1/KPNIH32.', required=True)
+    optional.add_argument('-coverage_depth_stats', action='store', dest="coverage_depth_stats", help='Run Only Depth of Coverage Stats module after read mapping')
     optional.add_argument('-c', action='store', dest="croplength", help='Crop Length in case needed')
     parser.add_argument('-f', action='store', dest="bam_input", help='Input Bam')
     return parser
@@ -43,10 +44,6 @@ def pipeline(args, logger):
     # Check Subroutines and create logger object: Arguments, Input files, Reference Index
     keep_logging('START: Checking Dependencies...', 'Checking Dependencies', logger, 'info')
 
-    if args.output_folder != '':
-        args.output_folder += '/'
-    make_sure_path_exists(args.output_folder)
-
     # Reference Genome file name
     reference = ConfigSectionMap(args.index, Config)['ref_path'] + "/" + ConfigSectionMap(args.index, Config)['ref_name']
     keep_logging('Getting Reference Genome name from config file: {}'.format(reference), 'Getting Reference Genome name from config file: {}'.format(reference), logger, 'info')
@@ -54,7 +51,7 @@ def pipeline(args, logger):
     # Check FASTQ files
     if args.type != "PE":
         reverse_raw = "None"
-        file_exists(args.forward_raw, reverse_raw, reference)
+        file_exists(args.forward_raw, args.forward_raw, reference)
     else:
         file_exists(args.forward_raw, args.reverse_raw, reference)
 
@@ -83,66 +80,79 @@ def pipeline(args, logger):
 
     ## 3. Stages: Post-Alignment using SAMTOOLS, PICARD etc
     keep_logging('START: Post-Alignment using SAMTOOLS, PICARD etc...', 'START: Post-Alignment using SAMTOOLS, PICARD etc...', logger, 'info')
-    #out_sorted_bam = prepare_bam(out_sam, args.output_folder, args.analysis_name, files_to_delete, logger, Config)
+    out_sorted_bam = prepare_bam(out_sam, args.output_folder, args.analysis_name, files_to_delete, logger, Config)
     keep_logging('END: Post-Alignment using SAMTOOLS, PICARD etc...', 'END: Post-Alignment using SAMTOOLS, PICARD etc...', logger, 'info')
-    keep_logging('START: Creating BedGraph Coverage', 'START: Creating BedGraph Coverage', logger, 'info')
     out_sorted_bam = "%s/%s_aln_sort.bam" % (args.output_folder, args.analysis_name)
-    #bedgraph_coverage(out_sorted_bam, args.output_folder, args.analysis_name, reference, logger, Config)
-    #only_unmapped_positions_file = bedtools(out_sorted_bam, args.output_folder, args.analysis_name, logger, Config)
-    keep_logging('END: Creating BedGraph Coverage', 'END: Creating BedGraph Coverage', logger, 'info')
 
 
-    ## 4. Stages: Variant Calling
-    keep_logging('START: Variant Calling', 'START: Variant Calling', logger, 'info')
-    caller = ConfigSectionMap("pipeline", Config)['variant_caller']
-    if caller == "samtoolswithpostalignbam":
-        keep_logging('START: Variant Calling using Samtools and post-align bam input files', 'START: Variant Calling using Samtools and post-align bam input files', logger, 'info')
-        out_finalbam = post_align_bam(out_sorted_bam, args.output_folder, args.index, args.analysis_name)
-        final_raw_vcf = variant_calling(out_finalbam, args.output_folder, args.index, args.analysis_name)
-        keep_logging('The final raw VCF file: {}'.format(final_raw_vcf), 'The final raw VCF file: {}'.format(final_raw_vcf), logger, 'debug')
-        keep_logging('END: Variant Calling using Samtools and post-align bam input files', 'END: Variant Calling using Samtools and post-align bam input files', logger, 'info')
-    elif caller == "gatkhaplotypecaller":
-        keep_logging('START: Variant Calling using GATK haplotyper and post-align bam input files', 'START: Variant Calling using GATK haplotyper and post-align bam input files', logger, 'info')
-        out_finalbam = post_align_bam(out_sorted_bam, args.output_folder, args.index, args.analysis_name)
-        final_raw_vcf = variant_calling(out_finalbam, args.output_folder, args.index, args.analysis_name)
-        keep_logging('The final raw VCF file: {}'.format(final_raw_vcf), 'The final raw VCF file: {}'.format(final_raw_vcf), logger, 'debug')
-        keep_logging('END: Variant Calling using GATK haplotyper and post-align bam input files', 'END: Variant Calling using GATK haplotyper and post-align bam input files', logger, 'info')
-    elif caller == "samtools":
-        keep_logging('START: Variant Calling using Samtools without post-align bam input files.', 'START: Variant Calling using Samtools without post-align bam input files.', logger, 'info')
-        #final_raw_vcf_mpileup = variant_calling(out_sorted_bam, args.output_folder, args.index, args.analysis_name, logger, Config)
-        #final_raw_vcf_mpileup = "%s/%s_aln_mpileup_raw.vcf" % (args.output_folder, args.analysis_name)
-        #final_raw_vcf = remove_5_bp_snp_indel(final_raw_vcf_mpileup, args.output_folder, args.analysis_name, reference, logger, Config)
-        final_raw_vcf = "%s/%s_aln_mpileup_raw.vcf_5bp_indel_removed.vcf" % (args.output_folder, args.analysis_name)
-        keep_logging('The final raw VCF file: {}'.format(final_raw_vcf), 'The final raw VCF file: {}'.format(final_raw_vcf), logger, 'debug')
-        keep_logging('END: Variant Calling using Samtools without post-align bam input files.', 'END: Variant Calling using Samtools without post-align bam input files.', logger, 'info')
+    # Run Depth of Coverage Module after read mapping and stop. Dont proceed to variant calling step.
+    if args.coverage_depth_stats:
+        gatk_DepthOfCoverage(out_sorted_bam, args.output_folder, args.analysis_name, reference, logger, Config)
+        alignment_stats_file = alignment_stats(out_sorted_bam, args.output_folder, args.analysis_name, logger, Config)
     else:
-        keep_logging('Please provide Variant Caller name in config file under the section [pipeline]. Options for Variant caller: 1. samtools 2. samtoolswithpostalignbam 3. gatkhaplotypecaller', 'Please provide Variant Caller name in config file under the section [pipeline]. Options for Variant caller: 1. samtools 2. samtoolswithpostalignbam 3. gatkhaplotypecaller', logger, 'info')
-        exit()
-    keep_logging('END: Variant Calling', 'END: Variant Calling', logger, 'info')
+        ## Continue: 3. Stages: Post-Alignment using SAMTOOLS, PICARD etc
+        keep_logging('START: Creating BedGraph Coverage', 'START: Creating BedGraph Coverage', logger, 'info')
+        bedgraph_coverage(out_sorted_bam, args.output_folder, args.analysis_name, reference, logger, Config)
+        only_unmapped_positions_file = bedtools(out_sorted_bam, args.output_folder, args.analysis_name, logger, Config)
+        keep_logging('END: Creating BedGraph Coverage', 'END: Creating BedGraph Coverage', logger, 'info')
 
 
-    ## 5. Stages: Variant Filteration
-    keep_logging('START: Variant Filteration', 'START: Variant Filteration', logger, 'info')
-    #filter2_variants(final_raw_vcf, args.output_folder, args.analysis_name, args.index, logger, Config)
-    keep_logging('END: Variant Filteration', 'END: Variant Filteration', logger, 'info')
+        ## 4. Stages: Variant Calling
+        keep_logging('START: Variant Calling', 'START: Variant Calling', logger, 'info')
+        caller = ConfigSectionMap("pipeline", Config)['variant_caller']
+        if caller == "samtoolswithpostalignbam":
+            keep_logging('START: Variant Calling using Samtools and post-align bam input files', 'START: Variant Calling using Samtools and post-align bam input files', logger, 'info')
+            out_finalbam = post_align_bam(out_sorted_bam, args.output_folder, args.index, args.analysis_name)
+            final_raw_vcf = variant_calling(out_finalbam, args.output_folder, args.index, args.analysis_name)
+            keep_logging('The final raw VCF file: {}'.format(final_raw_vcf), 'The final raw VCF file: {}'.format(final_raw_vcf), logger, 'debug')
+            keep_logging('END: Variant Calling using Samtools and post-align bam input files', 'END: Variant Calling using Samtools and post-align bam input files', logger, 'info')
+        elif caller == "gatkhaplotypecaller":
+            keep_logging('START: Variant Calling using GATK haplotyper and post-align bam input files', 'START: Variant Calling using GATK haplotyper and post-align bam input files', logger, 'info')
+            out_finalbam = post_align_bam(out_sorted_bam, args.output_folder, args.index, args.analysis_name)
+            final_raw_vcf = variant_calling(out_finalbam, args.output_folder, args.index, args.analysis_name)
+            keep_logging('The final raw VCF file: {}'.format(final_raw_vcf), 'The final raw VCF file: {}'.format(final_raw_vcf), logger, 'debug')
+            keep_logging('END: Variant Calling using GATK haplotyper and post-align bam input files', 'END: Variant Calling using GATK haplotyper and post-align bam input files', logger, 'info')
+        elif caller == "samtools":
+            keep_logging('START: Variant Calling using Samtools without post-align bam input files.', 'START: Variant Calling using Samtools without post-align bam input files.', logger, 'info')
+            final_raw_vcf_mpileup = variant_calling(out_sorted_bam, args.output_folder, args.index, args.analysis_name, logger, Config)
+            #final_raw_vcf_mpileup = "%s/%s_aln_mpileup_raw.vcf" % (args.output_folder, args.analysis_name)
+            final_raw_vcf = remove_5_bp_snp_indel(final_raw_vcf_mpileup, args.output_folder, args.analysis_name, reference, logger, Config)
+            #final_raw_vcf = "%s/%s_aln_mpileup_raw.vcf_5bp_indel_removed.vcf" % (args.output_folder, args.analysis_name)
+            keep_logging('The final raw VCF file: {}'.format(final_raw_vcf), 'The final raw VCF file: {}'.format(final_raw_vcf), logger, 'debug')
+            keep_logging('END: Variant Calling using Samtools without post-align bam input files.', 'END: Variant Calling using Samtools without post-align bam input files.', logger, 'info')
+        else:
+            keep_logging('Please provide Variant Caller name in config file under the section [pipeline]. Options for Variant caller: 1. samtools 2. samtoolswithpostalignbam 3. gatkhaplotypecaller', 'Please provide Variant Caller name in config file under the section [pipeline]. Options for Variant caller: 1. samtools 2. samtoolswithpostalignbam 3. gatkhaplotypecaller', logger, 'info')
+            exit()
+        keep_logging('END: Variant Calling', 'END: Variant Calling', logger, 'info')
 
 
-    ## 6. Stages: Statistics
-    keep_logging('START: Generating Statistics Reports', 'START: Generating Statistics Reports', logger, 'info')
-    alignment_stats_file = alignment_stats(out_sorted_bam, args.output_folder, args.analysis_name, logger, Config)
-    gatk_DepthOfCoverage(out_sorted_bam, args.output_folder, args.analysis_name, reference, logger, Config)
-    vcf_stats_file = vcf_stats(final_raw_vcf, args.output_folder, args.analysis_name, logger, Config)
-    qualimap_report = qualimap(out_sorted_bam, args.output_folder, args.analysis_name, logger, Config)
-    keep_logging('END: Generating Statistics Reports', 'END: Generating Statistics Reports', logger, 'info')
+        ## 5. Stages: Variant Filteration
+        keep_logging('START: Variant Filteration', 'START: Variant Filteration', logger, 'info')
+        filter2_variants(final_raw_vcf, args.output_folder, args.analysis_name, args.index, logger, Config)
+        keep_logging('END: Variant Filteration', 'END: Variant Filteration', logger, 'info')
 
-    # ################################################### Stages: Remove Unwanted Intermediate files ######################################
-    # # print "Removing Imtermediate Files...\n%s" % files_to_delete
-    # # for files in files_to_delete:
-    # #     os.remove(files)
-    # # print "Removing Imtermediate Files...\n%s" % files_to_delete
-    # # for files in files_to_delete:
-    # #     os.remove(files)
-    # ############################################################################ End ####################################################
+
+        ## 6. Stages: Statistics
+        keep_logging('START: Generating Statistics Reports', 'START: Generating Statistics Reports', logger, 'info')
+        alignment_stats_file = alignment_stats(out_sorted_bam, args.output_folder, args.analysis_name, logger, Config)
+        gatk_DepthOfCoverage(out_sorted_bam, args.output_folder, args.analysis_name, reference, logger, Config)
+        vcf_stats_file = vcf_stats(final_raw_vcf, args.output_folder, args.analysis_name, logger, Config)
+        #qualimap_report = qualimap(out_sorted_bam, args.output_folder, args.analysis_name, logger, Config)
+        keep_logging('END: Generating Statistics Reports', 'END: Generating Statistics Reports', logger, 'info')
+
+        # ################################################### Stages: Remove Unwanted Intermediate files ######################################
+        # # print "Removing Imtermediate Files...\n%s" % files_to_delete
+        # # for files in files_to_delete:
+        # #     os.remove(files)
+        # # print "Removing Imtermediate Files...\n%s" % files_to_delete
+        # # for files in files_to_delete:
+        # #     os.remove(files)
+        # ############################################################################ End ####################################################
+
+
+
+
+
 
 
 
@@ -203,6 +213,15 @@ def file_exists(path1, path2, reference):
         create_fai_index(reference, ref_fai_index)
     else:
         keep_logging('Samtools fai Index file already exists.', 'Samtools fai Index file already exists.', logger, 'info')
+    ############################################
+    dict_name = os.path.splitext(os.path.basename(reference))[0] + ".dict"
+    if not os.path.isfile(ConfigSectionMap(args.index, Config)['ref_path'] + "/" + dict_name):
+        keep_logging('The reference seq dict file {} required for GATK and PICARD does not exists.'.format(dict_name), 'The reference seq dict file {} required for GATK and PICARD does not exists.'.format(dict_name), logger, 'warning')
+        picard_seqdict(dict_name, reference)
+    else:
+        keep_logging('The reference seq dict file required for GATK and PICARD does not exists.', 'The reference seq dict file required for GATK and PICARD does not exists.', logger, 'info')
+
+
 
 def java_check():
     keep_logging('Checking Java Availability...', 'Checking Java Availability...', logger, 'info')
@@ -241,10 +260,10 @@ def make_sure_path_exists(out_path):
             exit()
 
 def create_index(reference,ref_index_suffix1, ref_index_suffix2, ref_index_suffix3, ref_index_suffix4, ref_index_suffix5):
-    aligner = ConfigSectionMap("pipeline")['aligner']
+    aligner = ConfigSectionMap("pipeline", Config)['aligner']
     keep_logging('Creating Index of reference fasta file for {} aligner.'.format(aligner), 'Creating Index of reference fasta file for {} aligner'.format(aligner), logger, 'info')
     if aligner == "bwa":
-        cmd = "%s %s %s" % (ConfigSectionMap("bwa")['base_cmd'], ConfigSectionMap("bwa")['index'], reference)
+        cmd = "%s %s %s" % (ConfigSectionMap("bwa", Config)['base_cmd'], ConfigSectionMap("bwa", Config)['index'], reference)
         keep_logging(cmd, cmd, logger, 'debug')
         try:
             call(cmd, logger)
@@ -258,7 +277,7 @@ def create_index(reference,ref_index_suffix1, ref_index_suffix2, ref_index_suffi
 
 def create_fai_index(reference, ref_fai_index):
     keep_logging('Creating FAI Index using Samtools.', 'Creating FAI Index using Samtools.', logger, 'info')
-    cmd = "%s %s %s" % (ConfigSectionMap("samtools")['base_cmd'], ConfigSectionMap("samtools")['faiindex'], reference)
+    cmd = "%s %s %s" % (ConfigSectionMap("samtools", Config)['base_cmd'], ConfigSectionMap("samtools", Config)['faiindex'], reference)
     keep_logging(cmd, cmd, logger, 'debug')
     try:
         call(cmd, logger)
@@ -268,9 +287,21 @@ def create_fai_index(reference, ref_fai_index):
 
 
     if not os.path.isfile(ref_fai_index):
-            keep_logging('The reference fai index file {} was not created properly.\n Please try to create the samtools fai index files manually. \n'.format(ref_fai_index), 'The reference fai index file {} was not created properly.\n Please try to create the samtools fai index files manually. \n'.format(ref_fai_index), logger, 'exception')
+        keep_logging('The reference fai index file {} was not created properly.\n Please try to create the samtools fai index files manually. \n'.format(ref_fai_index), 'The reference fai index file {} was not created properly.\n Please try to create the samtools fai index files manually. \n'.format(ref_fai_index), logger, 'exception')
     else:
         keep_logging('Samtools Fai Index file created.', 'Samtools Fai Index file created.', logger, 'info')
+
+def picard_seqdict(dict_name, reference):
+    #dict_name = os.path.splitext(os.path.basename(reference_filename))[0] + ".dict"
+    keep_logging('Creating Sequence Dictionary using Picard.', 'Creating Sequence Dictionary using Picard.', logger, 'info')
+    cmd = "java -jar %s/%s/%s CreateSequenceDictionary REFERENCE=%s OUTPUT=%s/%s" % (ConfigSectionMap("bin_path", Config)['binbase'], ConfigSectionMap("picard", Config)['picard_bin'], ConfigSectionMap("picard", Config)['base_cmd'], reference, ConfigSectionMap(args.index, Config)['ref_path'], dict_name)
+    keep_logging(cmd, cmd, logger, 'debug')
+    try:
+        call(cmd, logger)
+    except sp.CalledProcessError:
+        keep_logging('Error in Picard Sequence Dictionary creation step. Exiting.', 'Error in Picard Sequence Dictionary creation step. Exiting.', logger, 'exception')
+        sys.exit(1)
+
 
 ###
 
@@ -279,8 +310,14 @@ if __name__ == '__main__':
     start_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     args = parser().parse_args()
     global config_file
-    config_file = args.config
+    if args.config:
+        config_file = args.config
+    else:
+        config_file = "./config"
     global logger
+    if args.output_folder != '':
+        args.output_folder += '/'
+    make_sure_path_exists(args.output_folder)
     log_unique_time = datetime.now().strftime('%Y_%m_%d_%H_%M_%S')
     logger = generate_logger(args.output_folder, args.analysis_name, log_unique_time)
     global Config

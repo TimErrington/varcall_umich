@@ -2,10 +2,10 @@ __author__ = 'alipirani'
 
 import os
 from config_settings import ConfigSectionMap
-from samtools import *
-from picard import *
-from log_modules import keep_logging
-from logging_subprocess import *
+from modules.samtools import *
+from modules.picard import *
+from modules.log_modules import keep_logging
+from modules.logging_subprocess import *
 from sys import platform as _platform
 
 
@@ -132,7 +132,7 @@ def gatk_vcf2fasta_filter2(only_snp_filter2_vcf_file, out_path, analysis, refere
 ############################################################### GATK: DepthOfCoverage #######################################################################################################
 def gatk_DepthOfCoverage(out_sorted_bam, out_path, analysis_name, reference, logger, Config):
     base_cmd = ConfigSectionMap("bin_path", Config)['binbase'] + "/" + ConfigSectionMap("gatk", Config)['gatk_bin'] + "/" + ConfigSectionMap("gatk", Config)['base_cmd']
-    cmd = "java -jar %s -T DepthOfCoverage -R %s -o %s/%s_depth_of_coverage -I %s" % (base_cmd, reference, out_path, analysis_name, out_sorted_bam)
+    cmd = "java -jar %s -T DepthOfCoverage -R %s -o %s/%s_depth_of_coverage -I %s --summaryCoverageThreshold 15" % (base_cmd, reference, out_path, analysis_name, out_sorted_bam)
     keep_logging(cmd, cmd, logger, 'debug')
     try:
         call(cmd, logger)

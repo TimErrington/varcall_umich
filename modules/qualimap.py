@@ -1,8 +1,8 @@
 __author__ = 'alipirani'
 import os
 from config_settings import ConfigSectionMap
-from log_modules import keep_logging
-from logging_subprocess import *
+from modules.log_modules import keep_logging
+from modules.logging_subprocess import *
 from sys import platform as _platform
 
 

@@ -17,8 +17,8 @@ binbase: /home/apirani/bin/
 # Set parameter for Trimmomatic
 [Trimmomatic]
 trimmomatic_bin: /Trimmomatic/
-#adaptor_filepath: adapters/NexteraPE-PE.fa
-adaptor_filepath: adapters/TruSeq3-PE.fa
+adaptor_filepath: adapters/NexteraPE-PE.fa
+#adaptor_filepath: adapters/TruSeq3-PE.fa
 seed_mismatches: 2
 palindrome_clipthreshold: 30
 simple_clipthreshold: 10
@@ -138,7 +138,7 @@ Ref_Path: /Users/alipirani/Documents/bin/bin_varcall/reference//KPNIH32/
 # Name of reference genome fasta file.
 Ref_Name: Efae_aus0004_genome.fa
 # path to the reference genome fasta file.
-Ref_Path: /Users/alipirani/Documents/bin/bin_varcall/reference//aus/
+Ref_Path: /home/apirani/bin/reference/aus/
 
 
 # Name of the reference genome. Provide this value with -index_name argument.
@@ -146,7 +146,7 @@ Ref_Path: /Users/alipirani/Documents/bin/bin_varcall/reference//aus/
 # Name of reference genome fasta file.
 Ref_Name: Efae_EPI51_060509_genome.fa
 # path to the reference genome fasta file.
-Ref_Path: /Users/alipirani/Documents/bin/bin_varcall/reference//EPI51/
+Ref_Path: /home/apirani/bin/reference/EPI51/
 
 
 # Name of the reference genome. Provide this value with -index_name argument.
@@ -154,7 +154,7 @@ Ref_Path: /Users/alipirani/Documents/bin/bin_varcall/reference//EPI51/
 # Name of reference genome fasta file.
 Ref_Name: EnGen0178_genome.fa
 # path to the reference genome fasta file.
-Ref_Path: /Users/alipirani/Documents/bin/bin_varcall/reference//EnGen0178/
+Ref_Path: /home/apirani/bin/reference/EnGen0178/
 
 
 # Name of the reference genome. Provide this value with -index_name argument.
@@ -162,7 +162,7 @@ Ref_Path: /Users/alipirani/Documents/bin/bin_varcall/reference//EnGen0178/
 # Name of reference genome fasta file.
 Ref_Name: EnGen0377_genome.fa
 # path to the reference genome fasta file.
-Ref_Path: /Users/alipirani/Documents/bin/bin_varcall/reference//EnGen0377/
+Ref_Path: /home/apirani/bin/reference/EnGen0377/
 
 [ECNIH3]
 # Name of reference genome fasta file.
@@ -267,3 +267,98 @@ Ref_Name: cdiff_630.fasta
 Ref_Path: /home/apirani/bin/reference/CDIFF_630/
 
 ########################################################################################################################
+
+
+# KPC Cluster Specific Reference Genomes
+
+[313]
+# Name of reference genome fasta file.
+Ref_Name: 313_R1_001_final_l500_contigs.fasta
+# path to the reference genome fasta file.
+Ref_Path: /nfs/esnitkin/Ali/Project_KPC_LTACH_analysis/Analysis/Project_KPC_all_KPC_2008+Hiseq+Latest/2017-01-17-Variant-Calling_Strain_Specific/data/reference/
+
+[Rush_KPC_108]
+# Name of reference genome fasta file.
+Ref_Name: Rush_KPC_108_R1_l500_contigs.fasta
+# path to the reference genome fasta file.
+Ref_Path: /nfs/esnitkin/Ali/Project_KPC_LTACH_analysis/Analysis/Project_KPC_all_KPC_2008+Hiseq+Latest/2017-01-17-Variant-Calling_Strain_Specific/data/reference/
+
+[Rush_KPC_110]
+# Name of reference genome fasta file.
+Ref_Name: Rush_KPC_110_R1_l500_contigs.fasta
+# path to the reference genome fasta file.
+Ref_Path: /nfs/esnitkin/Ali/Project_KPC_LTACH_analysis/Analysis/Project_KPC_all_KPC_2008+Hiseq+Latest/2017-01-17-Variant-Calling_Strain_Specific/data/reference/
+
+[Rush_KPC_157]
+# Name of reference genome fasta file.
+Ref_Name: Rush_KPC_157_R1_l500_contigs.fasta
+# path to the reference genome fasta file.
+Ref_Path: /nfs/esnitkin/Ali/Project_KPC_LTACH_analysis/Analysis/Project_KPC_all_KPC_2008+Hiseq+Latest/2017-01-17-Variant-Calling_Strain_Specific/data/reference/
+
+[Rush_KPC_212]
+# Name of reference genome fasta file.
+Ref_Name: Rush_KPC_212_R1_l500_contigs.fasta
+# path to the reference genome fasta file.
+Ref_Path: /nfs/esnitkin/Ali/Project_KPC_LTACH_analysis/Analysis/Project_KPC_all_KPC_2008+Hiseq+Latest/2017-01-17-Variant-Calling_Strain_Specific/data/reference/
+
+[Rush_KPC_216]
+# Name of reference genome fasta file.
+Ref_Name: Rush_KPC_216_R1_l500_contigs.fasta
+# path to the reference genome fasta file.
+Ref_Path: /nfs/esnitkin/Ali/Project_KPC_LTACH_analysis/Analysis/Project_KPC_all_KPC_2008+Hiseq+Latest/2017-01-17-Variant-Calling_Strain_Specific/data/reference/
+
+[Rush_KPC_233]
+# Name of reference genome fasta file.
+Ref_Name: Rush_KPC_233_R1_l500_contigs.fasta
+# path to the reference genome fasta file.
+Ref_Path: /nfs/esnitkin/Ali/Project_KPC_LTACH_analysis/Analysis/Project_KPC_all_KPC_2008+Hiseq+Latest/2017-01-17-Variant-Calling_Strain_Specific/data/reference/
+
+[Rush_KPC_412]
+# Name of reference genome fasta file.
+Ref_Name: Rush_KPC_412_R1_l500_contigs.fasta
+# path to the reference genome fasta file.
+Ref_Path: /nfs/esnitkin/Ali/Project_KPC_LTACH_analysis/Analysis/Project_KPC_all_KPC_2008+Hiseq+Latest/2017-01-17-Variant-Calling_Strain_Specific/data/reference/
+
+[Rush_KPC_48]
+# Name of reference genome fasta file.
+Ref_Name: Rush_KPC_48_R1_l500_contigs.fasta
+# path to the reference genome fasta file.
+Ref_Path: /nfs/esnitkin/Ali/Project_KPC_LTACH_analysis/Analysis/Project_KPC_all_KPC_2008+Hiseq+Latest/2017-01-17-Variant-Calling_Strain_Specific/data/reference/
+
+[Rush_KPC_52]
+# Name of reference genome fasta file.
+Ref_Name: Rush_KPC_52_R1_l500_contigs.fasta
+# path to the reference genome fasta file.
+Ref_Path: /nfs/esnitkin/Ali/Project_KPC_LTACH_analysis/Analysis/Project_KPC_all_KPC_2008+Hiseq+Latest/2017-01-17-Variant-Calling_Strain_Specific/data/reference/
+
+[Rush_KPC_586]
+# Name of reference genome fasta file.
+Ref_Name: Rush_KPC_586_R1_l500_contigs.fasta
+# path to the reference genome fasta file.
+Ref_Path: /nfs/esnitkin/Ali/Project_KPC_LTACH_analysis/Analysis/Project_KPC_all_KPC_2008+Hiseq+Latest/2017-01-17-Variant-Calling_Strain_Specific/data/reference/
+
+[Rush_KPC_653]
+# Name of reference genome fasta file.
+Ref_Name: Rush_KPC_653_R1_l500_contigs.fasta
+# path to the reference genome fasta file.
+Ref_Path: /nfs/esnitkin/Ali/Project_KPC_LTACH_analysis/Analysis/Project_KPC_all_KPC_2008+Hiseq+Latest/2017-01-17-Variant-Calling_Strain_Specific/data/reference/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

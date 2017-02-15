@@ -1,7 +1,7 @@
 __author__ = 'alipirani'
 import os
-from log_modules import keep_logging
-from logging_subprocess import *
+from modules.log_modules import keep_logging
+from modules.logging_subprocess import *
 from config_settings import ConfigSectionMap
 
 
@@ -30,7 +30,7 @@ def markduplicates(out_sorted_bam, out_path, analysis, files_to_delete, logger, 
 ######################### picard: Prepare Reference Sequence Dictionary for GATK indel realignment #############################
 def picard_seqdict(reference_filename, reference):
     dict_name = os.path.splitext(os.path.basename(reference_filename))[0] + ".dict"
-    cmd = "java -jar %s CreateSequenceDictionary REFERENCE=%s OUTPUT=%s/%s" % (base_cmd, reference_filename, ConfigSectionMap(reference)['ref_path'],dict_name)
+    cmd = "java -jar %s CreateSequenceDictionary REFERENCE=%s OUTPUT=%s/%s" % (base_cmd, reference_filename, ConfigSectionMap(reference, Config)['ref_path'],dict_name)
     print "\nRunning:\n [%s] \n" % cmd
     os.system(cmd)
 ######################### END: picard: Prepare Reference Sequence Dictionary for GATK indel realignment #############################
