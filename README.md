@@ -10,6 +10,7 @@
 >5. Variant Filtering and generating Consensus using [GATK](https://software.broadinstitute.org/gatk/), [Bedtools](http://bedtools.readthedocs.io/en/latest/), [vcftools](http://vcftools.sourceforge.net/), in-house scripts() etc.
 
 <br>
+<br>
 
 **Usage:**
 ***
@@ -18,6 +19,40 @@
 python pipeline.py [-h] -PE1 path-to-forward-PE-read -PE2 path-to-reverse-PE-read -o path-to-OUTPUT_FOLDER -analysis ANALYSIS_NAME -index INDEX_NAME_as_per_config_file -config path-to-config-file
 ```
 <br>
+
+** optional arguments: **
+
+```
+
+  -h, --help            show this help message and exit
+  -f BAM_INPUT          Input Bam
+  
+```
+** Required arguments: **
+
+```
+
+  -type TYPE            Type of analysis: SE or PE
+  -config CONFIG        Path to Config file
+  -PE1 FORWARD_RAW      Path to Paired End file 1
+  -o OUTPUT_FOLDER      Output Path ending with output directory name to save
+                        the results
+  -analysis ANALYSIS_NAME
+                        Unique analysis name to save the results
+  -index INDEX          Reference Index Name. Change this argument in config
+                        file and mention the reference header name such as
+                        KP_NTUH_chr/KPNIH1/KPNIH32.
+
+Optional arguments:
+  -PE2 REVERSE_RAW      Path to Paired End file 2
+  -coverage_depth_stats COVERAGE_DEPTH_STATS
+                        Run Only Depth of Coverage Stats module after read
+                        mapping
+  -c CROPLENGTH         Crop Length in case needed
+
+```
+<br>
+
 
 **Note:**
 ***
