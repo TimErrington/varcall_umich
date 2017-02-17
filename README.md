@@ -1,6 +1,6 @@
 # Variant Calling Pipeline for SE/PE illumina reads
 
-## The pipeline runs sequentially as follows:
+#### The pipeline runs sequentially as follows:
 ***
 
 >1. Pre-Processing Raw reads using [Trimmomatic](http://www.usadellab.org/cms/?page=trimmomatic)
@@ -9,6 +9,7 @@
 >4. Variant Calling using [SAMTOOLS](http://samtools.sourceforge.net/)
 >5. Variant Filtering and generating Consensus using [GATK](https://software.broadinstitute.org/gatk/), [Bedtools](http://bedtools.readthedocs.io/en/latest/), [vcftools](http://vcftools.sourceforge.net/), in-house scripts() etc.
 
+<br>
 
 **Usage:**
 ***
@@ -27,6 +28,8 @@ python pipeline.py [-h] -PE1 path-to-forward-PE-read -PE2 path-to-reverse-PE-rea
 - ***INDEX***: Reference Index Name as mentioned under the section 'Reference Genome to be used for pipeline'. 
   e.g: In config file; under the section [KPNIH1], mention the attributes REF_NAME and REF_PATH for reference fasta filename and path to the reference fasta file resp. The section name KPNIH1 is required by the INDEX argument.
 - config: Path to your customized config file. Make sure the section names are similar to the default config file.
+
+<br>
 
 **Customizing Config file:**
 ***
@@ -47,14 +50,14 @@ variant_caller: samtools
 binbase: /home/apirani/bin/
 ```
 
-** Make sure all the executables and dependencies are placed in bin folder supplied with binbase option under section [bin_path].**
+<br>
 
-#### NOTE: Add the required perl libraries(such as in the case of vcftools) PERL5LIB environment variable. 
+#### NOTE: 
 
-
-Currently, The pipeline supports BWA aligner(mem algorithm) for aligning reads to the reference genome and samtools for variant calling.
-
-Parameters for each tools can be customised under the 'tool_parameter' attribute of each tool in config file.
+> Make sure all the executables and dependencies are placed in bin folder supplied with binbase option under section [bin_path]. 
+> Add the required perl libraries(such as in the case of vcftools) PERL5LIB environment variable. 
+> Currently, The pipeline supports BWA aligner(mem algorithm) for aligning reads to the reference genome and samtools for variant calling.
+> Parameters for each tools can be customised under the 'tool_parameter' attribute of each tool in config file.
 
 **Output**:
 ***
