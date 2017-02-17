@@ -47,8 +47,9 @@ variant_caller: samtools
 binbase: /home/apirani/bin/
 ```
 
-Make sure all the executablesdependencies are placed in bin folder supplies with binbase under section [bin_path]. 
-NOTE: Add the required perl libraries(such as in the case of vcftools) PERL5LIB environment variable. 
+** Make sure all the executables and dependencies are placed in bin folder supplied with binbase option under section [bin_path].**
+
+#### NOTE: Add the required perl libraries(such as in the case of vcftools) PERL5LIB environment variable. 
 
 
 Currently, The pipeline supports BWA aligner(mem algorithm) for aligning reads to the reference genome and samtools for variant calling.
