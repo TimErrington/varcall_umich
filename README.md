@@ -62,6 +62,10 @@ python pipeline.py [-h] -PE1 path-to-forward-PE-read -PE2 path-to-reverse-PE-rea
 - ***INDEX***: Reference Index Name as mentioned under the section 'Reference Genome to be used for pipeline'. 
   e.g: In config file; under the section [KPNIH1], mention the attributes REF_NAME and REF_PATH for reference fasta filename and path to the reference fasta file resp. The section name KPNIH1 is required by the INDEX argument.
 - config: Path to your customized config file. Make sure the section names are similar to the default config file.
+- Make sure all the executables and dependencies are placed in bin folder supplied with binbase option under section [bin_path]. 
+- Add the required perl libraries(such as in the case of vcftools) PERL5LIB environment variable. 
+- Currently, The pipeline supports BWA aligner(mem algorithm) for aligning reads to the reference genome and samtools for variant calling.
+- Parameters for each tools can be customised under the 'tool_parameter' attribute of each tool in config file.
 
 <br>
 
@@ -86,18 +90,6 @@ binbase: /home/apirani/bin/
 
 <br>
 
-#### NOTE: 
-
-> Make sure all the executables and dependencies are placed in bin folder supplied with binbase option under section [bin_path]. 
-
-> Add the required perl libraries(such as in the case of vcftools) PERL5LIB environment variable. 
-
-> Currently, The pipeline supports BWA aligner(mem algorithm) for aligning reads to the reference genome and samtools for variant calling.
-
-> Parameters for each tools can be customised under the 'tool_parameter' attribute of each tool in config file.
- 
- <br>
- 
 **Output**:
 ***
 
