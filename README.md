@@ -89,10 +89,15 @@ binbase: /home/apirani/bin/
 #### NOTE: 
 
 > Make sure all the executables and dependencies are placed in bin folder supplied with binbase option under section [bin_path]. 
-> Add the required perl libraries(such as in the case of vcftools) PERL5LIB environment variable. 
-> Currently, The pipeline supports BWA aligner(mem algorithm) for aligning reads to the reference genome and samtools for variant calling.
-> Parameters for each tools can be customised under the 'tool_parameter' attribute of each tool in config file.
 
+> Add the required perl libraries(such as in the case of vcftools) PERL5LIB environment variable. 
+
+> Currently, The pipeline supports BWA aligner(mem algorithm) for aligning reads to the reference genome and samtools for variant calling.
+
+> Parameters for each tools can be customised under the 'tool_parameter' attribute of each tool in config file.
+ 
+ <br>
+ 
 **Output**:
 ***
 
