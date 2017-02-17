@@ -20,15 +20,21 @@ python pipeline.py [-h] -PE1 path-to-forward-PE-read -PE2 path-to-reverse-PE-rea
 ```
 <br>
 
-** optional arguments: **
+**Optional arguments:**
 
 ```
 
   -h, --help            show this help message and exit
   -f BAM_INPUT          Input Bam
+  -PE2 REVERSE_RAW      Path to Paired End file 2
+  -coverage_depth_stats COVERAGE_DEPTH_STATS
+                        Run Only Depth of Coverage Stats module after read
+                        mapping
+  -c CROPLENGTH         Crop Length in case needed
   
 ```
-** Required arguments: **
+
+**Required arguments:**
 
 ```
 
@@ -42,13 +48,6 @@ python pipeline.py [-h] -PE1 path-to-forward-PE-read -PE2 path-to-reverse-PE-rea
   -index INDEX          Reference Index Name. Change this argument in config
                         file and mention the reference header name such as
                         KP_NTUH_chr/KPNIH1/KPNIH32.
-
-Optional arguments:
-  -PE2 REVERSE_RAW      Path to Paired End file 2
-  -coverage_depth_stats COVERAGE_DEPTH_STATS
-                        Run Only Depth of Coverage Stats module after read
-                        mapping
-  -c CROPLENGTH         Crop Length in case needed
 
 ```
 <br>
