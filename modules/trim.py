@@ -24,7 +24,11 @@ def trim(input1, input2, out_path, crop, logger, Config):
         headcrop_string = 'HEADCROP:' + ConfigSectionMap("Trimmomatic", Config)['headcrop_length']
         if not crop:
             cmdstring = "java -jar " + ConfigSectionMap("bin_path", Config)['binbase'] + ConfigSectionMap("Trimmomatic", Config)['trimmomatic_bin'] + "trimmomatic-0.33.jar PE " + input1 + " " + input2 + " " + clean_filenames + " " + illumina_string + " " + sliding_string + " " + minlen_string + " " + headcrop_string
+<<<<<<< HEAD
             keep_logging("COMMAND: " + cmdstring, cmdstring, logger, 'debug')
+=======
+            keep_logging(cmdstring, cmdstring, logger, 'debug')
+>>>>>>> 02b125e3d68903b94aba39c984cecc3b7d770e55
             try:
                 call(cmdstring, logger)
                 print ""
@@ -52,7 +56,11 @@ def trim(input1, input2, out_path, crop, logger, Config):
         headcrop_string = 'HEADCROP:' + ConfigSectionMap("Trimmomatic", Config)['headcrop_length']
         if not crop:
             cmdstring = "java -jar " + ConfigSectionMap("bin_path", Config)['binbase'] + ConfigSectionMap("Trimmomatic", Config)['trimmomatic_bin'] + "trimmomatic-0.33.jar SE " + input1 + " " + clean_filenames + " " + illumina_string + " " + sliding_string + " " + minlen_string + " " + headcrop_string
+<<<<<<< HEAD
             keep_logging("COMMAND: " + cmdstring, cmdstring, logger, 'debug')
+=======
+            keep_logging(cmdstring, cmdstring, logger, 'debug')
+>>>>>>> 02b125e3d68903b94aba39c984cecc3b7d770e55
             try:
                 call(cmdstring, logger)
             except sp.CalledProcessError:
@@ -63,10 +71,23 @@ def trim(input1, input2, out_path, crop, logger, Config):
         else:
             crop_string = 'CROP:' + crop
             cmdstring = "java -jar " + ConfigSectionMap("bin_path", Config)['binbase'] + ConfigSectionMap("Trimmomatic", Config)['trimmomatic_bin'] + "trimmomatic-0.33.jar SE " + input1 + " " + clean_filenames + " " + crop_string + " " + illumina_string + " " + sliding_string + " " + minlen_string
+<<<<<<< HEAD
             keep_logging("COMMAND: " + cmdstring, cmdstring, logger, 'debug')
+=======
+            keep_logging(cmdstring, cmdstring, logger, 'debug')
+>>>>>>> 02b125e3d68903b94aba39c984cecc3b7d770e55
             try:
                 call(cmdstring, logger)
             except sp.CalledProcessError:
                     keep_logging('Error in Trimming step. Exiting.', 'Error in Trimming step. Exiting.', logger, 'exception')
                     sys.exit(1)
             keep_logging('End: Data Pre-processing', 'End: Data Pre-processing', logger, 'info')
+<<<<<<< HEAD
+=======
+
+
+
+
+
+
+>>>>>>> 02b125e3d68903b94aba39c984cecc3b7d770e55

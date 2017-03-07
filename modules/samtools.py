@@ -10,9 +10,16 @@ def samtobam(out_sam, out_path, analysis, files_to_delete, logger, Config):
     base_cmd = ConfigSectionMap("bin_path", Config)['binbase'] + "/" + ConfigSectionMap("samtools", Config)['samtools_bin'] + "/" + ConfigSectionMap("samtools", Config)['base_cmd']
     cmd = "%s view -Sb %s > %s/%s_aln.bam" % (base_cmd, out_sam, out_path, analysis)
     keep_logging('SAM to BAM Conversion', 'SAM to BAM Conversion', logger, 'info')
+<<<<<<< HEAD
     keep_logging("COMMAND: " + cmd, cmd, logger, 'debug')
     try:
         call(cmd, logger)
+=======
+    keep_logging(cmd, cmd, logger, 'debug')
+    try:
+        call(cmd, logger)
+        print ""
+>>>>>>> 02b125e3d68903b94aba39c984cecc3b7d770e55
     except sp.CalledProcessError:
         keep_logging('Error in SAM-to-BAM Conversion step. Exiting.', 'Error in SAM-to-BAM Conversion step. Exiting.', logger, 'exception')
         sys.exit(1)
@@ -32,7 +39,11 @@ def sort_bam(out_bam, out_path, analysis, logger, Config):
     base_cmd = ConfigSectionMap("bin_path", Config)['binbase'] + "/" + ConfigSectionMap("samtools", Config)['samtools_bin'] + "/" + ConfigSectionMap("samtools", Config)['base_cmd']
     cmd = "%s sort %s %s/%s_aln_sort" % (base_cmd, out_bam, out_path, analysis)
     keep_logging('Sorting BAM file', 'Sorting BAM file', logger, 'info')
+<<<<<<< HEAD
     keep_logging("COMMAND: " + cmd, cmd, logger, 'debug')
+=======
+    keep_logging(cmd, cmd, logger, 'debug')
+>>>>>>> 02b125e3d68903b94aba39c984cecc3b7d770e55
     try:
         call(cmd, logger)
         #print ""
@@ -53,7 +64,11 @@ def sort_bam(out_bam, out_path, analysis, logger, Config):
 def index_bam(out_sort_bam, out_path, logger, Config):
     base_cmd = ConfigSectionMap("bin_path", Config)['binbase'] + "/" + ConfigSectionMap("samtools", Config)['samtools_bin'] + "/" + ConfigSectionMap("samtools", Config)['base_cmd']
     cmd = "%s index %s" % (base_cmd, out_sort_bam)
+<<<<<<< HEAD
     keep_logging("COMMAND: " + cmd, cmd, logger, 'info')
+=======
+    keep_logging(cmd, cmd, logger, 'info')
+>>>>>>> 02b125e3d68903b94aba39c984cecc3b7d770e55
     try:
         call(cmd, logger)
         #print ""
@@ -91,7 +106,11 @@ def samtools(out_finalbam, out_path, reference_filename, analysis, logger, Confi
     reference = ConfigSectionMap(reference_filename, Config)['ref_path'] + "/" + ConfigSectionMap(reference_filename, Config)['ref_name']
     bcf_base_cmd = ConfigSectionMap("bin_path", Config)['binbase'] + "/" + ConfigSectionMap("bcftools", Config)['bcftools_bin'] + ConfigSectionMap("bcftools", Config)['base_cmd']
     cmd = "%s mpileup %s %s %s | %s call -O v -v -c -o %s/%s_aln_mpileup_raw.vcf" % (base_cmd, mpileup_parameters, reference, out_finalbam, bcf_base_cmd, out_path, analysis)
+<<<<<<< HEAD
     keep_logging("COMMAND: " + cmd, cmd, logger, 'debug')
+=======
+    keep_logging(cmd, cmd, logger, 'debug')
+>>>>>>> 02b125e3d68903b94aba39c984cecc3b7d770e55
     try:
         call(cmd, logger)
         #print ""
@@ -106,7 +125,11 @@ def samtools(out_finalbam, out_path, reference_filename, analysis, logger, Confi
 def flagstat(out_sorted_bam, out_path, analysis, logger, Config):
     base_cmd = ConfigSectionMap("bin_path", Config)['binbase'] + "/" + ConfigSectionMap("samtools", Config)['samtools_bin'] + "/" + ConfigSectionMap("samtools", Config)['base_cmd']
     cmd = "%s flagstat %s > %s/%s_alignment_stats" % (base_cmd, out_sorted_bam, out_path, analysis)
+<<<<<<< HEAD
     keep_logging("COMMAND: " + cmd, cmd, logger, 'debug')
+=======
+    keep_logging(cmd, cmd, logger, 'debug')
+>>>>>>> 02b125e3d68903b94aba39c984cecc3b7d770e55
     try:
         call(cmd, logger)
         #print ""
