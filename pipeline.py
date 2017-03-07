@@ -7,31 +7,11 @@ import errno
 from datetime import datetime
 import ConfigParser
 from config_settings import ConfigSectionMap
-<<<<<<< HEAD
-from modules.check_subroutines import *
-from modules.stages import *
-from modules.bedtools import *
-from modules.qualimap import *
-=======
 #from check_subroutines import *
->>>>>>> 02b125e3d68903b94aba39c984cecc3b7d770e55
 if sys.version_info < (3, 2):
     import subprocess32 as sp
 else:
     import subprocess as sp
-<<<<<<< HEAD
-from modules.logging_subprocess import *
-from modules.log_modules import *
-from modules.generate_PTR_dataframe import *
-
-# Command Line Argument Parsing
-def parser():
-    parser = argparse.ArgumentParser(description='PTR Analysis pipeline for Illumina datasets.')
-    required = parser.add_argument_group('Required arguments')
-    optional = parser.add_argument_group('Optional arguments')
-    required.add_argument('-type', action='store', dest="type", help='Type of analysis: SE or PE', required=True)
-    optional.add_argument('-config', action='store', dest="config", help='Path to Config file', required=False)
-=======
 from modules.stages import *
 from modules.remove_5_bp_snp_indel import *
 from modules.bedtools import *
@@ -47,23 +27,11 @@ def parser():
     optional = parser.add_argument_group('Optional arguments')
     required.add_argument('-type', action='store', dest="type", help='Type of analysis: SE or PE', required=True)
     required.add_argument('-config', action='store', dest="config", help='Path to Config file', required=True)
->>>>>>> 02b125e3d68903b94aba39c984cecc3b7d770e55
     required.add_argument('-PE1', action='store', dest="forward_raw", help='Path to Paired End file 1', required=True)
     optional.add_argument('-PE2', action='store', dest="reverse_raw", help='Path to Paired End file 2', required=False)
     required.add_argument('-o', action='store', dest="output_folder", help='Output Path ending with output directory name to save the results', required=True)
     required.add_argument('-analysis', action='store', dest="analysis_name", help='Unique analysis name to save the results', required=True)
     required.add_argument('-index', action='store', dest="index", help='Reference Index Name. Change this argument in config file and mention the reference header name such as KP_NTUH_chr/KPNIH1/KPNIH32.', required=True)
-<<<<<<< HEAD
-    optional.add_argument('-c', action='store', dest="croplength", help='Crop Length in case needed')
-    optional.add_argument('-f', action='store', dest="bam_input", help='Input Bam')
-    return parser
-
-
-# Main Pipeline
-def pipeline(args, logger):
-
-    keep_logging('\nSTART: Pipeline\n', 'START: Pipeline\n', logger, 'info')
-=======
     optional.add_argument('-coverage_depth_stats', action='store', dest="coverage_depth_stats", help='Run Only Depth of Coverage Stats module after read mapping')
     optional.add_argument('-c', action='store', dest="croplength", help='Crop Length in case needed')
     parser.add_argument('-f', action='store', dest="bam_input", help='Input Bam')
@@ -72,7 +40,6 @@ def pipeline(args, logger):
 # Main Pipeline
 def pipeline(args, logger):
     keep_logging('START: Pipeline', 'START: Pipeline', logger, 'info')
->>>>>>> 02b125e3d68903b94aba39c984cecc3b7d770e55
 
     # Check Subroutines and create logger object: Arguments, Input files, Reference Index
     keep_logging('START: Checking Dependencies...', 'Checking Dependencies', logger, 'info')
@@ -90,12 +57,8 @@ def pipeline(args, logger):
 
     # Check Java Version
     java_check()
-<<<<<<< HEAD
-    keep_logging('END: Checking Dependencies...\n', 'END: Checking Dependencies\n', logger, 'info')
-=======
     keep_logging('END: Checking Dependencies...', 'END: Checking Dependencies', logger, 'info')
 
->>>>>>> 02b125e3d68903b94aba39c984cecc3b7d770e55
 
     ## 1. Pre-Processing Raw reads using Trimmomatic
     keep_logging('START: Pre-Processing Raw reads using Trimmomatic', 'START: Pre-Processing Raw reads using Trimmomatic', logger, 'info')
@@ -103,37 +66,6 @@ def pipeline(args, logger):
         trimmomatic(args.forward_raw, args.reverse_raw, args.output_folder, args.croplength, logger, Config)
     else:
         reverse_raw = "None"
-<<<<<<< HEAD
-        #trimmomatic(args.forward_raw, reverse_raw, args.output_folder, args.croplength, logger, Config)
-    keep_logging('END: Pre-Processing Raw reads using Trimmomatic\n', 'END: Pre-Processing Raw reads using Trimmomatic\n', logger, 'info')
-
-    # ## 2. Stages: Alignment using BWA
-    # keep_logging('START: Mapping Reads using {}'.format(ConfigSectionMap("pipeline", Config)['aligner']), 'START: Mapping Reads using {}'.format(ConfigSectionMap("pipeline", Config)['aligner']), logger, 'info')
-    # split_field = prepare_readgroup(args.forward_raw, ConfigSectionMap("pipeline", Config)['aligner'], logger)
-    # files_to_delete = []
-    # out_sam = align(args.bam_input, args.output_folder, args.index, split_field, args.analysis_name, files_to_delete, logger, Config, args.type)
-    # keep_logging('END: Mapping Reads using {}\n'.format(ConfigSectionMap("pipeline", Config)['aligner']), 'END: Mapping Reads using {}\n'.format(ConfigSectionMap("pipeline", Config)['aligner']), logger, 'info')
-    #
-    # ## 3. Stages: Post-Alignment using SAMTOOLS, PICARD etc
-    # keep_logging('START: Post-Alignment using SAMTOOLS, PICARD etc...', 'START: Post-Alignment using SAMTOOLS, PICARD etc...', logger, 'info')
-    # out_sorted_bam = prepare_bam(out_sam, args.output_folder, args.analysis_name, files_to_delete, logger, Config)
-    # # out_sorted_bam = "%s/%s_aln_sort.bam" % (args.output_folder, args.analysis_name)
-    # final_coverage_file = bedtools(out_sorted_bam, args.output_folder, args.analysis_name, logger, Config)
-    # keep_logging('END: Post-Alignment using SAMTOOLS, PICARD etc...\n', 'END: Post-Alignment using SAMTOOLS, PICARD etc...\n', logger, 'info')
-    #
-    # ## 4. Stages: Statistics
-    # keep_logging('START: Generating Statistics Reports', 'START: Generating Statistics Reports', logger, 'info')
-    # alignment_stats_file = alignment_stats(out_sorted_bam, args.output_folder, args.analysis_name, logger, Config)
-    # gatk_DepthOfCoverage(out_sorted_bam, args.output_folder, args.analysis_name, reference, logger, Config)
-    # qualimap_report = qualimap(out_sorted_bam, args.output_folder, args.analysis_name, logger, Config)
-    # # final_coverage_file = "%s/%s_coverage.bed" % (args.output_folder, args.analysis_name)
-    # keep_logging('END: Generating Statistics Reports\n', 'END: Generating Statistics Reports\n', logger, 'info')
-    final_coverage_file = "%s/%s_coverage.bed" % (args.output_folder, args.analysis_name)
-    ## 5. Stages: PTR Analysis
-    keep_logging('START: Analyzing Bedfiles for PTR analysis', 'START: Analyzing Bedfiles for PTR analysis', logger, 'info')
-    generate_PTR_dataframe(final_coverage_file, args.output_folder, logger, Config)
-    keep_logging('END: Analyzing Bedfiles for PTR analysis\n', 'END: Analyzing Bedfiles for PTR analysis\n', logger, 'info')
-=======
         trimmomatic(args.forward_raw, reverse_raw, args.output_folder, args.croplength, logger, Config)
     keep_logging('END: Pre-Processing Raw reads using Trimmomatic', 'END: Pre-Processing Raw reads using Trimmomatic', logger, 'info')
 
@@ -224,7 +156,6 @@ def pipeline(args, logger):
 
 
 
->>>>>>> 02b125e3d68903b94aba39c984cecc3b7d770e55
 
 ## Check Subroutines
 def usage():
@@ -260,27 +191,14 @@ def file_exists(path1, path2, reference):
         ref_index_suffix3 = reference + ".ann"
         ref_index_suffix4 = reference + ".sa"
         ref_index_suffix5 = reference + ".pac"
-<<<<<<< HEAD
     elif ConfigSectionMap("pipeline")['aligner'] == "bowtie":
-=======
-<<<<<<< HEAD
-    elif ConfigSectionMap("pipeline", Config)['aligner'] == "bowtie":
->>>>>>> d567014e041f722948bec9a7ff6c5e339de749f6
         ref_index_suffix1 = reference + ".1.bt2"
         ref_index_suffix2 = reference + ".2.bt2"
         ref_index_suffix3 = reference + ".3.bt2"
         ref_index_suffix4 = reference + ".4.ebwt"
         ref_index_suffix5 = reference + ".rev.1.bt2"
         ref_index_suffix6 = reference + ".rev.2.bt2"
-<<<<<<< HEAD
-=======
-    else:
-=======
-    else:
-        ###########################################
->>>>>>> d567014e041f722948bec9a7ff6c5e339de749f6
 
->>>>>>> 02b125e3d68903b94aba39c984cecc3b7d770e55
         print "Please change the aligner section in config file."
 
         print "Different Aligner in config file"
@@ -306,11 +224,7 @@ def file_exists(path1, path2, reference):
         keep_logging('The reference seq dict file {} required for GATK and PICARD does not exists.'.format(dict_name), 'The reference seq dict file {} required for GATK and PICARD does not exists.'.format(dict_name), logger, 'warning')
         picard_seqdict(dict_name, reference)
     else:
-<<<<<<< HEAD
-        keep_logging('The reference seq dict file required for GATK and PICARD exists.', 'The reference seq dict file required for GATK and PICARD exists.', logger, 'info')
-=======
         keep_logging('The reference seq dict file required for GATK and PICARD does not exists.', 'The reference seq dict file required for GATK and PICARD does not exists.', logger, 'info')
->>>>>>> 02b125e3d68903b94aba39c984cecc3b7d770e55
 
 
 
@@ -394,10 +308,6 @@ def picard_seqdict(dict_name, reference):
         sys.exit(1)
 
 
-<<<<<<< HEAD
-
-=======
->>>>>>> 02b125e3d68903b94aba39c984cecc3b7d770e55
 ###
 
 # Main Method
@@ -408,11 +318,7 @@ if __name__ == '__main__':
     if args.config:
         config_file = args.config
     else:
-<<<<<<< HEAD
-        config_file = os.path.dirname(os.path.abspath(__file__)) + "/config"
-=======
         config_file = "./config"
->>>>>>> 02b125e3d68903b94aba39c984cecc3b7d770e55
     global logger
     if args.output_folder != '':
         args.output_folder += '/'
@@ -424,24 +330,3 @@ if __name__ == '__main__':
     Config.read(config_file)
     pipeline(args, logger)
     keep_logging('End: Pipeline', 'End: Pipeline', logger, 'info')
-<<<<<<< HEAD
-
-
-
-
-
-
-
-
-
-# extract_mapped_reads = "/home/apirani/bin/samtools-1.2/samtools view -b -F 4 %s > %s_mapped.bam" % (out_sorted_bam, out_sorted_bam)
-# extract_fastq = "/home/apirani/bin/bedtools2-master/bin/bedtools bamtofastq -i %s_mapped.bam -fq %s/%s_mapped.fastq" % (out_sorted_bam, args.output_folder, args.analysis_name)
-# shuff_fastq = "paste <(cat %s/%s_mapped.fastq) | paste - - - - | shuf | awk -F\'\\t\' \'{OFS=\"\\n\"; print $1,$2,$3,$4 > \"%s/%s_mapped_shuff.fastq\"}\'" % (out_path, args.analysis_name, out_path, args.analysis_name)
-# print shuff_fastq
-# #gzip_fastq = "gzip %s/%s_mapped.fastq" % (args.output_folder, args.analysis_name)
-# print extract_mapped_reads + "\n" + extract_fastq + "\n" + shuff_fastq
-# os.system(extract_mapped_reads)
-# os.system(extract_fastq)
-# #os.system(shuff_fastq)
-=======
->>>>>>> 02b125e3d68903b94aba39c984cecc3b7d770e55
