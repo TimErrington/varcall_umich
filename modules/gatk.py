@@ -63,8 +63,13 @@ def gatk_filter2(final_raw_vcf, out_path, analysis, reference, logger, Config):
     gatk_filter2_parameter_expression = ConfigSectionMap("gatk", Config)['gatk_filter2_parameter_expression']
     gatk_filter2_command = "java -jar %s -T VariantFiltration -R %s -o %s/%s_filter2_gatk.vcf --variant %s --filterExpression \"%s\" --filterName PASS_filter2" % (base_cmd, reference, out_path, analysis, final_raw_vcf, gatk_filter2_parameter_expression)
     filter_flag_command = "grep '#\|PASS_filter2' %s/%s_filter2_gatk.vcf > %s/%s_filter2_final.vcf" % (out_path, analysis, out_path, analysis)
+<<<<<<< HEAD
+    keep_logging("COMMAND: " + gatk_filter2_command, gatk_filter2_command, logger, 'debug')
+    keep_logging("COMMAND: " + filter_flag_command, filter_flag_command, logger, 'debug')
+=======
     keep_logging(gatk_filter2_command, gatk_filter2_command, logger, 'debug')
     keep_logging(filter_flag_command, filter_flag_command, logger, 'debug')
+>>>>>>> 02b125e3d68903b94aba39c984cecc3b7d770e55
     try:
         call(gatk_filter2_command, logger)
         call(filter_flag_command, logger)
@@ -100,7 +105,11 @@ def gatk_vcf2fasta_filter2(only_snp_filter2_vcf_file, out_path, analysis, refere
     base_cmd = ConfigSectionMap("bin_path", Config)['binbase'] + "/" + ConfigSectionMap("gatk", Config)['gatk_bin'] + "/" + ConfigSectionMap("gatk", Config)['base_cmd']
     vcf2fasta_filter2_cmd = "java -jar %s -R %s -T FastaAlternateReferenceMaker -o %s_filter2.fasta --variant %s" % (base_cmd, reference, only_snp_filter2_vcf_file, only_snp_filter2_vcf_file)
     #print vcf2fasta
+<<<<<<< HEAD
+    keep_logging("COMMAND: " + vcf2fasta_filter2_cmd, vcf2fasta_filter2_cmd, logger, 'debug')
+=======
     keep_logging(vcf2fasta_filter2_cmd, vcf2fasta_filter2_cmd, logger, 'debug')
+>>>>>>> 02b125e3d68903b94aba39c984cecc3b7d770e55
     try:
         call(vcf2fasta_filter2_cmd, logger)
         #print ""
@@ -133,7 +142,11 @@ def gatk_vcf2fasta_filter2(only_snp_filter2_vcf_file, out_path, analysis, refere
 def gatk_DepthOfCoverage(out_sorted_bam, out_path, analysis_name, reference, logger, Config):
     base_cmd = ConfigSectionMap("bin_path", Config)['binbase'] + "/" + ConfigSectionMap("gatk", Config)['gatk_bin'] + "/" + ConfigSectionMap("gatk", Config)['base_cmd']
     cmd = "java -jar %s -T DepthOfCoverage -R %s -o %s/%s_depth_of_coverage -I %s --summaryCoverageThreshold 15" % (base_cmd, reference, out_path, analysis_name, out_sorted_bam)
+<<<<<<< HEAD
+    keep_logging("COMMAND: " + cmd, cmd, logger, 'debug')
+=======
     keep_logging(cmd, cmd, logger, 'debug')
+>>>>>>> 02b125e3d68903b94aba39c984cecc3b7d770e55
     try:
         call(cmd, logger)
         #print ""

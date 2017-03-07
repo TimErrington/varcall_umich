@@ -1,6 +1,10 @@
+<<<<<<< HEAD
+# Growth-rate-analysis
+This project is still in progress
+=======
 # Variant Calling Pipeline for SE/PE illumina reads
 
-## The pipeline runs sequentially as follows:
+#### The pipeline runs sequentially as follows:
 ***
 
 >1. Pre-Processing Raw reads using [Trimmomatic](http://www.usadellab.org/cms/?page=trimmomatic)
@@ -9,6 +13,8 @@
 >4. Variant Calling using [SAMTOOLS](http://samtools.sourceforge.net/)
 >5. Variant Filtering and generating Consensus using [GATK](https://software.broadinstitute.org/gatk/), [Bedtools](http://bedtools.readthedocs.io/en/latest/), [vcftools](http://vcftools.sourceforge.net/), in-house scripts() etc.
 
+<br>
+<br>
 
 **Usage:**
 ***
@@ -16,6 +22,41 @@
 ```
 python pipeline.py [-h] -PE1 path-to-forward-PE-read -PE2 path-to-reverse-PE-read -o path-to-OUTPUT_FOLDER -analysis ANALYSIS_NAME -index INDEX_NAME_as_per_config_file -config path-to-config-file
 ```
+<br>
+
+**Optional arguments:**
+
+```
+
+  -h, --help            show this help message and exit
+  -f BAM_INPUT          Input Bam
+  -PE2 REVERSE_RAW      Path to Paired End file 2
+  -coverage_depth_stats COVERAGE_DEPTH_STATS
+                        Run Only Depth of Coverage Stats module after read
+                        mapping
+  -c CROPLENGTH         Crop Length in case needed
+  
+```
+
+**Required arguments:**
+
+```
+
+  -type TYPE            Type of analysis: SE or PE
+  -config CONFIG        Path to Config file
+  -PE1 FORWARD_RAW      Path to Paired End file 1
+  -o OUTPUT_FOLDER      Output Path ending with output directory name to save
+                        the results
+  -analysis ANALYSIS_NAME
+                        Unique analysis name to save the results
+  -index INDEX          Reference Index Name. Change this argument in config
+                        file and mention the reference header name such as
+                        KP_NTUH_chr/KPNIH1/KPNIH32.
+
+```
+<br>
+
+
 **Note:**
 ***
 
@@ -25,6 +66,12 @@ python pipeline.py [-h] -PE1 path-to-forward-PE-read -PE2 path-to-reverse-PE-rea
 - ***INDEX***: Reference Index Name as mentioned under the section 'Reference Genome to be used for pipeline'. 
   e.g: In config file; under the section [KPNIH1], mention the attributes REF_NAME and REF_PATH for reference fasta filename and path to the reference fasta file resp. The section name KPNIH1 is required by the INDEX argument.
 - config: Path to your customized config file. Make sure the section names are similar to the default config file.
+- Make sure all the executables and dependencies are placed in bin folder supplied with binbase option under section [bin_path]. 
+- Add the required perl libraries(such as in the case of vcftools) PERL5LIB environment variable. 
+- Currently, The pipeline supports BWA aligner(mem algorithm) for aligning reads to the reference genome and samtools for variant calling.
+- Parameters for each tools can be customised under the 'tool_parameter' attribute of each tool in config file.
+
+<br>
 
 **Customizing Config file:**
 ***
@@ -45,13 +92,7 @@ variant_caller: samtools
 binbase: /home/apirani/bin/
 ```
 
-Make sure all the executablesdependencies are placed in bin folder supplies with binbase under section [bin_path]. 
-NOTE: Add the required perl libraries(such as in the case of vcftools) PERL5LIB environment variable. 
-
-
-Currently, The pipeline supports BWA aligner(mem algorithm) for aligning reads to the reference genome and samtools for variant calling.
-
-Parameters for each tools can be customised under the 'tool_parameter' attribute of each tool in config file.
+<br>
 
 **Output**:
 ***
@@ -76,8 +117,20 @@ The pipeline generates various output files from different tools at different st
 >4. ***analysisname_markduplicates_metrics***: Mark Duplicates metrics generated during Picard Mark Duplicates step.
 >5. ***analysisname_report.pdf*** and ***genome_results.txt***: generated using [Qualimap bamQC](http://qualimap.bioinfo.cipf.es/).
 
+<br>
+
 **Log:**
 ***
 
-The pipeline generates a log file following the naming convention: yyyy_mm_dd_hrs_mins_secs_analysisname.log.txt and tracks each event/command run by the pipleine. The log file sections follow the standard [Python logging conventions](https://docs.python.org/2/howto/logging.html): 
-***INFO*** to print STDOUT messages; ***DEBUG*** to print commands ran by pipeline, ***ERROR*** to print STDERR messages and ***EXCEPTION*** to print an exception that occured while the pipeline was running.
+The pipeline generates a log file following the naming convention: yyyy_mm_dd_hrs_mins_secs_analysisname.log.txt and tracks each event/command run by the pipleine. 
+
+The log file sections follows the standard [Python logging conventions](https://docs.python.org/2/howto/logging.html): 
+
+> ***INFO*** to print STDOUT messages;
+
+> ***DEBUG*** to print commands ran by pipeline,
+
+> ***ERROR*** to print STDERR messages and 
+
+> ***EXCEPTION*** to print an exception that occured while the pipeline was running.
+>>>>>>> 02b125e3d68903b94aba39c984cecc3b7d770e55
