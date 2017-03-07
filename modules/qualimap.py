@@ -5,10 +5,6 @@ from modules.log_modules import keep_logging
 from modules.logging_subprocess import *
 from sys import platform as _platform
 
-
-
-
-
 def bamqc(out_sorted_bam, out_path, analysis, logger, Config):
     qualimap_base_command = ConfigSectionMap("bin_path", Config)['binbase'] + "/" + ConfigSectionMap("qualimap", Config)['qualimap_bin'] + "/" + ConfigSectionMap("qualimap", Config)['base_cmd']
     qualimap_bam_qc_cmd = "%s bamqc -bam %s -outdir %s -outfile %s_report.pdf -outformat pdf" % (qualimap_base_command, out_sorted_bam, out_path, analysis)

@@ -191,8 +191,13 @@ def file_exists(path1, path2, reference):
         ref_index_suffix3 = reference + ".ann"
         ref_index_suffix4 = reference + ".sa"
         ref_index_suffix5 = reference + ".pac"
-    else:
-        ###########################################
+    elif ConfigSectionMap("pipeline")['aligner'] == "bowtie":
+        ref_index_suffix1 = reference + ".1.bt2"
+        ref_index_suffix2 = reference + ".2.bt2"
+        ref_index_suffix3 = reference + ".3.bt2"
+        ref_index_suffix4 = reference + ".4.ebwt"
+        ref_index_suffix5 = reference + ".rev.1.bt2"
+        ref_index_suffix6 = reference + ".rev.2.bt2"
 
         print "Please change the aligner section in config file."
 

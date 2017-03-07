@@ -17,8 +17,8 @@ binbase: /home/apirani/bin/
 # Set parameter for Trimmomatic
 [Trimmomatic]
 trimmomatic_bin: /Trimmomatic/
-adaptor_filepath: adapters/NexteraPE-PE.fa
-#adaptor_filepath: adapters/TruSeq3-PE.fa
+#adaptor_filepath: adapters/NexteraPE-PE.fa
+adaptor_filepath: adapters/TruSeq3-PE.fa
 seed_mismatches: 2
 palindrome_clipthreshold: 30
 simple_clipthreshold: 10
@@ -343,7 +343,11 @@ Ref_Name: Rush_KPC_653_R1_l500_contigs.fasta
 # path to the reference genome fasta file.
 Ref_Path: /nfs/esnitkin/Ali/Project_KPC_LTACH_analysis/Analysis/Project_KPC_all_KPC_2008+Hiseq+Latest/2017-01-17-Variant-Calling_Strain_Specific/data/reference/
 
-
+[CFT073]
+# Name of reference genome fasta file.
+Ref_Name: EscherichiacoliCFT073.fna
+# path to the reference genome fasta file.
+Ref_Path: /home/apirani/bin/reference/CFT073
 
 
 
