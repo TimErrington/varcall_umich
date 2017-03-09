@@ -1,6 +1,6 @@
 # Variant Calling Pipeline for SE/PE illumina reads
 
-## The pipeline runs sequentially as follows:
+#### The pipeline runs sequentially as follows:
 ***
 
 >1. Pre-Processing Raw reads using [Trimmomatic](http://www.usadellab.org/cms/?page=trimmomatic)
