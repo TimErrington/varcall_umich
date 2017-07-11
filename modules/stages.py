@@ -22,13 +22,37 @@ def prepare_readgroup(forward_read, logger):
     samplename = os.path.basename(forward_read)
     if forward_read.endswith(".gz"):
         ###
+
+
+	#output = gzip.open(forward_read, 'rb')
+        #firstLine = output.readline()
+        #split_field = re.split(r":",firstLine)
+        #id_name = split_field[1]
+        #id_name = id_name.strip()
+        #split_field = "\"" + "@RG" + "\\tID:" + split_field[1] + "\\tSM:" + samplename + "\\tLB:1\\tPL:Illumina" + "\""
+        #return split_field
+
         output = gzip.open(forward_read, 'rb')
         firstLine = output.readline()
-        split_field = re.split(r":",firstLine)
-        id_name = split_field[1]
-        id_name = id_name.strip()
-        split_field = "\"" + "@RG" + "\\tID:" + split_field[1] + "\\tSM:" + samplename + "\\tLB:1\\tPL:Illumina" + "\""
-        return split_field
+        if ":" in firstLine:
+            split_field = re.split(r":",firstLine)
+            id_name = split_field[1].rstrip()
+            id_name = id_name.rstrip()
+	    split_field = "\"" + "@RG" + "\\tID:" + split_field[1] + "\\tSM:" + samplename + "\\tLB:1\\tPL:Illumina" + "\""
+            
+        ###Pending
+        elif "/" in firstLine:
+            split_field = re.split(r"/",firstLine)
+            #id_name = "1"
+            id_name = split_field[1].rstrip()
+            id_name = id_name.rstrip()
+            #id_name = split_field[1].rstrip()
+            #id_name = id_name.rstrip()
+            split_field = "\"" + "@RG" + "\\tID:" + id_name + "\\tSM:" + samplename + "\\tLB:1\\tPL:Illumina" + "\""
+        else:
+	    id_name = "1"
+	    split_field = "\"" + "@RG" + "\\tID:" + id_name + "\\tSM:" + samplename + "\\tLB:1\\tPL:Illumina" + "\""
+	return split_field
 
     elif forward_read.endswith(".fastq"):
         ###
@@ -55,24 +79,15 @@ def trimmomatic(input1, input2, out_path, crop, logger, Config):
 ## End ##
 
 ## bwa, smalt, bowtie: Alignment ##
-def align(bam_input, out_path, ref_index, split_field, analysis, files_to_delete, logger, Config, type):
+def align(out_path, ref_index, split_field, analysis, files_to_delete, logger, Config, type):
     reference = ConfigSectionMap(ref_index, Config)['ref_path'] + "/" + ConfigSectionMap(ref_index, Config)['ref_name']
     forward_clean = out_path + "/" + ConfigSectionMap("Trimmomatic", Config)['f_p']
     reverse_clean = out_path + "/" + ConfigSectionMap("Trimmomatic", Config)['r_p']
     aligner = ConfigSectionMap("pipeline", Config)['aligner']
     if aligner == "bwa":
         base_cmd = ConfigSectionMap("bin_path", Config)['binbase'] + "/" + ConfigSectionMap("bwa", Config)['bwa_bin'] + "/" + ConfigSectionMap("bwa", Config)['base_cmd']
-        #check if the input is bam or fastq
-        if bam_input:
-            if bam_input.endswith(".bam"):
-                #do alignment of bam and all here
-                print "bam alignment"
-            else:
-                #throw error
-                print "error"
-        else:
-            out_file = align_bwa(base_cmd,forward_clean, reverse_clean, out_path, reference, split_field, analysis, files_to_delete, logger, Config, type)
-            return out_file
+        out_file = align_bwa(base_cmd,forward_clean, reverse_clean, out_path, reference, split_field, analysis, files_to_delete, logger, Config, type)
+        return out_file
     elif aligner == "smalt":
         print "Smalt addition pending"
         exit()
@@ -125,9 +140,9 @@ def qualimap(out_sorted_bam, out_path, analysis, logger, Config):
 ## END ##
 
 ## Variant Filteration ##
-def filter2_variants(final_raw_vcf, out_path, analysis, ref_index, logger, Config):
+def filter2_variants(final_raw_vcf, out_path, analysis, ref_index, logger, Config, Avg_dp):
     reference = ConfigSectionMap(ref_index, Config)['ref_path'] + "/" + ConfigSectionMap(ref_index, Config)['ref_name']
-    gatk_filter2_final_vcf_file = gatk_filter2(final_raw_vcf, out_path, analysis, reference, logger, Config)
+    gatk_filter2_final_vcf_file = gatk_filter2(final_raw_vcf, out_path, analysis, reference, logger, Config, Avg_dp)
     gatk_filter2_final_vcf_file_no_proximate_snp = remove_proximate_snps(gatk_filter2_final_vcf_file, out_path, analysis, reference, logger, Config)
     keep_logging('The vcf file with no proximate snp: {}'.format(gatk_filter2_final_vcf_file_no_proximate_snp), 'The vcf file with no proximate snp: {}'.format(gatk_filter2_final_vcf_file_no_proximate_snp), logger, 'debug')
     gatk_vcf2fasta_filter2_file = gatk_vcf2fasta_filter2(gatk_filter2_final_vcf_file, out_path, analysis, reference, logger, Config)

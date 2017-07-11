@@ -23,7 +23,7 @@ def trim(input1, input2, out_path, crop, logger, Config):
         minlen_string = 'MINLEN:' + ConfigSectionMap("Trimmomatic", Config)['minlength']
         headcrop_string = 'HEADCROP:' + ConfigSectionMap("Trimmomatic", Config)['headcrop_length']
         if not crop:
-            cmdstring = "java -jar " + ConfigSectionMap("bin_path", Config)['binbase'] + ConfigSectionMap("Trimmomatic", Config)['trimmomatic_bin'] + "trimmomatic-0.33.jar PE " + input1 + " " + input2 + " " + clean_filenames + " " + illumina_string + " " + sliding_string + " " + minlen_string + " " + headcrop_string
+            cmdstring = "java -jar " + ConfigSectionMap("bin_path", Config)['binbase'] + ConfigSectionMap("Trimmomatic", Config)['trimmomatic_bin'] + "trimmomatic-0.33.jar PE -phred33 " + input1 + " " + input2 + " " + clean_filenames + " " + illumina_string + " " + sliding_string + " " + minlen_string + " " + headcrop_string
             keep_logging(cmdstring, cmdstring, logger, 'debug')
             try:
                 call(cmdstring, logger)

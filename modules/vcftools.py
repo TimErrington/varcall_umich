@@ -49,7 +49,7 @@ def vcftools_vcf2fasta_filter1(only_snp_filter1_vcf_file, out_path, analysis, re
     base_vcftools_perl = ConfigSectionMap("bin_path", Config)['binbase'] + "/" + ConfigSectionMap("vcftools", Config)['vcftools_perl_bin']
     base_vcftools_bin = ConfigSectionMap("bin_path", Config)['binbase'] + "/" + ConfigSectionMap("vcftools", Config)['vcftools_bin']
     #print only_snp_filter1_vcf_file
-    bgzip_cmd = "%s/bgzip %s" % (base_tabix, only_snp_filter1_vcf_file)
+    bgzip_cmd = "%s/bgzip -f %s" % (base_tabix, only_snp_filter1_vcf_file)
     os.system(bgzip_cmd)
     tabix_cmd = "%s/tabix %s.gz" % (base_tabix, only_snp_filter1_vcf_file)
     os.system(tabix_cmd)
@@ -69,7 +69,7 @@ def vcftools_vcf2fasta_filter2(only_snp_filter2_vcf, out_path, analysis, referen
     base_tabix = ConfigSectionMap("bin_path", Config)['binbase'] + "/" + ConfigSectionMap("vcftools", Config)['tabix_bin']
     base_vcftools_perl = ConfigSectionMap("bin_path", Config)['binbase'] + "/" + ConfigSectionMap("vcftools", Config)['vcftools_perl_bin']
     base_vcftools_bin = ConfigSectionMap("bin_path", Config)['binbase'] + "/" + ConfigSectionMap("vcftools", Config)['vcftools_bin']
-    bgzip_cmd = "%s/bgzip %s" % (base_tabix, only_snp_filter2_vcf)
+    bgzip_cmd = "%s/bgzip -f %s" % (base_tabix, only_snp_filter2_vcf)
     os.system(bgzip_cmd)
     tabix_cmd = "%s/tabix %s.gz" % (base_tabix, only_snp_filter2_vcf)
     os.system(tabix_cmd)
@@ -101,7 +101,7 @@ def vcfstats(final_raw_vcf, out_path, analysis, logger, Config):
     base_tabix = ConfigSectionMap("bin_path", Config)['binbase'] + "/" + ConfigSectionMap("vcftools", Config)['tabix_bin']
     base_vcftools_perl = ConfigSectionMap("bin_path", Config)['binbase'] + "/" + ConfigSectionMap("vcftools", Config)['vcftools_perl_bin']
     base_vcftools_bin = ConfigSectionMap("bin_path", Config)['binbase'] + "/" + ConfigSectionMap("vcftools", Config)['vcftools_bin']
-    bgzip_cmd = "%s/bgzip %s" % (base_tabix, final_raw_vcf)
+    bgzip_cmd = "%s/bgzip -f %s" % (base_tabix, final_raw_vcf)
     os.system(bgzip_cmd)
     tabix_cmd = "%s/tabix %s.gz" % (base_tabix, final_raw_vcf)
     os.system(tabix_cmd)

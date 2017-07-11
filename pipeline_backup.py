@@ -18,12 +18,11 @@ from modules.bedtools import *
 from modules.gatk import gatk_DepthOfCoverage
 from modules.logging_subprocess import *
 from modules.log_modules import *
-from argparse import RawTextHelpFormatter
 
 
 # Command Line Argument Parsing
 def parser():
-    parser = argparse.ArgumentParser(description='\nVariant Calling pipeline for Illumina PE/SE data.\n', formatter_class=RawTextHelpFormatter)
+    parser = argparse.ArgumentParser(description='Variant Calling pipeline for Illumina PE data.')
     required = parser.add_argument_group('Required arguments')
     optional = parser.add_argument_group('Optional arguments')
     required.add_argument('-type', action='store', dest="type", help='Type of analysis: SE or PE', required=True)
@@ -33,13 +32,9 @@ def parser():
     required.add_argument('-o', action='store', dest="output_folder", help='Output Path ending with output directory name to save the results', required=True)
     required.add_argument('-analysis', action='store', dest="analysis_name", help='Unique analysis name to save the results', required=True)
     required.add_argument('-index', action='store', dest="index", help='Reference Index Name. Change this argument in config file and mention the reference header name such as KP_NTUH_chr/KPNIH1/KPNIH32.', required=True)
-    #optional.add_argument('-coverage_depth_stats', action='store', dest="coverage_depth_stats", help='Run Only Depth of Coverage Stats module after read mapping')
+    optional.add_argument('-coverage_depth_stats', action='store', dest="coverage_depth_stats", help='Run Only Depth of Coverage Stats module after read mapping')
     optional.add_argument('-c', action='store', dest="croplength", help='Crop Length in case needed')
-    required.add_argument('-steps', action='store', dest="steps", help='Variant Calling Steps in sequential order.\n'
-                                                                     '1.   All : This will run all the steps starting from cleaning the reads to variant calling;\n'
-                                                                     '2.   clean,align,post-align,varcall,filter,stats : This will also run all steps starting from cleaning to variant calling. \nYou can also run part of the pipeline by giving "align,post-align,varcall,filter,stats" which will skip the cleaning part.\nThe order is required to be sequential. Also, while skipping any of the step make sure you have results already present in your output folder.\n'
-                                                                     '3.   coverage_depth_stats: Run Only Depth of Coverage Stats module after cleaning and read mapping steps')
-    optional.add_argument('-cluster', action='store', dest='cluster', help='Run pipeline on cluster/parallel-local/local. Make Sure to check if the [CLUSTER] section in config file is set up correctly.')
+    parser.add_argument('-f', action='store', dest="bam_input", help='Input Bam')
     return parser
 
 # Main Pipeline
@@ -64,56 +59,45 @@ def pipeline(args, logger):
     java_check()
     keep_logging('END: Checking Dependencies...', 'END: Checking Dependencies', logger, 'info')
 
-    """ Start the pipeline: """
-    steps_list = args.steps.split(',')
-    if args.cluster:
-        cluster = args.cluster
-    else:
-        cluster = "local"
-
 
     ## 1. Pre-Processing Raw reads using Trimmomatic
-    def clean():
-        keep_logging('START: Pre-Processing Raw reads using Trimmomatic', 'START: Pre-Processing Raw reads using Trimmomatic', logger, 'info')
-        if args.type == "PE":
-            trimmomatic(args.forward_raw, args.reverse_raw, args.output_folder, args.croplength, logger, Config)
-        else:
-            reverse_raw = "None"
-            trimmomatic(args.forward_raw, reverse_raw, args.output_folder, args.croplength, logger, Config)
-        keep_logging('END: Pre-Processing Raw reads using Trimmomatic', 'END: Pre-Processing Raw reads using Trimmomatic', logger, 'info')
+    keep_logging('START: Pre-Processing Raw reads using Trimmomatic', 'START: Pre-Processing Raw reads using Trimmomatic', logger, 'info')
+    if args.type == "PE":
+        trimmomatic(args.forward_raw, args.reverse_raw, args.output_folder, args.croplength, logger, Config)
+    else:
+        reverse_raw = "None"
+        trimmomatic(args.forward_raw, reverse_raw, args.output_folder, args.croplength, logger, Config)
+    keep_logging('END: Pre-Processing Raw reads using Trimmomatic', 'END: Pre-Processing Raw reads using Trimmomatic', logger, 'info')
 
 
     ## 2. Stages: Alignment using BWA
-    def align_reads():
-        keep_logging('START: Mapping Reads using BWA', 'START: Mapping Reads using BWA', logger, 'info')
-        split_field = prepare_readgroup(args.forward_raw, logger)
-        out_sam = align(args.output_folder, args.index, split_field, args.analysis_name, files_to_delete, logger, Config, args.type)
-        keep_logging('END: Mapping Reads using BWA', 'END: Mapping Reads using BWA', logger, 'info')
-        return out_sam
+    keep_logging('START: Mapping Reads using BWA', 'START: Mapping Reads using BWA', logger, 'info')
+    split_field = prepare_readgroup(args.forward_raw, logger)
+    files_to_delete = []
+    out_sam = align(args.bam_input, args.output_folder, args.index, split_field, args.analysis_name, files_to_delete, logger, Config, args.type)
+    keep_logging('END: Mapping Reads using BWA', 'END: Mapping Reads using BWA', logger, 'info')
 
+
+    ## 3. Stages: Post-Alignment using SAMTOOLS, PICARD etc
+    keep_logging('START: Post-Alignment using SAMTOOLS, PICARD etc...', 'START: Post-Alignment using SAMTOOLS, PICARD etc...', logger, 'info')
+    out_sorted_bam = prepare_bam(out_sam, args.output_folder, args.analysis_name, files_to_delete, logger, Config)
+    keep_logging('END: Post-Alignment using SAMTOOLS, PICARD etc...', 'END: Post-Alignment using SAMTOOLS, PICARD etc...', logger, 'info')
+    out_sorted_bam = "%s/%s_aln_sort.bam" % (args.output_folder, args.analysis_name)
 
 
     # Run Depth of Coverage Module after read mapping and stop. Dont proceed to variant calling step.
-    def coverage_depth_stats():
-        gatk_DepthOfCoverage_file = gatk_DepthOfCoverage(out_sorted_bam, args.output_folder, args.analysis_name, reference, logger, Config)
+    if args.coverage_depth_stats:
+        gatk_DepthOfCoverage(out_sorted_bam, args.output_folder, args.analysis_name, reference, logger, Config)
         alignment_stats_file = alignment_stats(out_sorted_bam, args.output_folder, args.analysis_name, logger, Config)
-        return gatk_DepthOfCoverage_file
-
-    ## Continue: 3. Stages: Post-Alignment using SAMTOOLS, PICARD etc
-    ## 3. Stages: Post-Alignment using SAMTOOLS, PICARD etc
-    def post_align():
-        keep_logging('START: Post-Alignment using SAMTOOLS, PICARD etc...', 'START: Post-Alignment using SAMTOOLS, PICARD etc...', logger, 'info')
-        out_sorted_bam = prepare_bam(out_sam, args.output_folder, args.analysis_name, files_to_delete, logger, Config)
-        keep_logging('END: Post-Alignment using SAMTOOLS, PICARD etc...', 'END: Post-Alignment using SAMTOOLS, PICARD etc...', logger, 'info')
-        #out_sorted_bam = "%s/%s_aln_sort.bam" % (args.output_folder, args.analysis_name)
+    else:
+        ## Continue: 3. Stages: Post-Alignment using SAMTOOLS, PICARD etc
         keep_logging('START: Creating BedGraph Coverage', 'START: Creating BedGraph Coverage', logger, 'info')
         bedgraph_coverage(out_sorted_bam, args.output_folder, args.analysis_name, reference, logger, Config)
         only_unmapped_positions_file = bedtools(out_sorted_bam, args.output_folder, args.analysis_name, logger, Config)
         keep_logging('END: Creating BedGraph Coverage', 'END: Creating BedGraph Coverage', logger, 'info')
-        return out_sorted_bam
 
-    ## 4. Stages: Variant Calling
-    def varcall():
+
+        ## 4. Stages: Variant Calling
         keep_logging('START: Variant Calling', 'START: Variant Calling', logger, 'info')
         caller = ConfigSectionMap("pipeline", Config)['variant_caller']
         if caller == "samtoolswithpostalignbam":
@@ -136,135 +120,41 @@ def pipeline(args, logger):
             #final_raw_vcf = "%s/%s_aln_mpileup_raw.vcf_5bp_indel_removed.vcf" % (args.output_folder, args.analysis_name)
             keep_logging('The final raw VCF file: {}'.format(final_raw_vcf), 'The final raw VCF file: {}'.format(final_raw_vcf), logger, 'debug')
             keep_logging('END: Variant Calling using Samtools without post-align bam input files.', 'END: Variant Calling using Samtools without post-align bam input files.', logger, 'info')
-            return final_raw_vcf
         else:
             keep_logging('Please provide Variant Caller name in config file under the section [pipeline]. Options for Variant caller: 1. samtools 2. samtoolswithpostalignbam 3. gatkhaplotypecaller', 'Please provide Variant Caller name in config file under the section [pipeline]. Options for Variant caller: 1. samtools 2. samtoolswithpostalignbam 3. gatkhaplotypecaller', logger, 'info')
             exit()
         keep_logging('END: Variant Calling', 'END: Variant Calling', logger, 'info')
 
 
-    ## 5. Stages: Variant Filteration
-    def filter(gatk_depth_of_coverage_file):
+        ## 5. Stages: Variant Filteration
         keep_logging('START: Variant Filteration', 'START: Variant Filteration', logger, 'info')
-        Avg_dp_cmd = "grep \'^Total\' %s | awk -F\'\t\' \'{print $3}\'" % gatk_depth_of_coverage_file
-        proc = sp.Popen([Avg_dp_cmd], stdout=sp.PIPE, shell=True)
-        (out, err) = proc.communicate()
-        Avg_dp = float(out)
-        print "The Average Depth per reference genome base is: %s" % Avg_dp
-        filter2_variants(final_raw_vcf, args.output_folder, args.analysis_name, args.index, logger, Config, Avg_dp)
+        filter2_variants(final_raw_vcf, args.output_folder, args.analysis_name, args.index, logger, Config)
         keep_logging('END: Variant Filteration', 'END: Variant Filteration', logger, 'info')
 
 
-    ## 6. Stages: Statistics
-    def stats():
+        ## 6. Stages: Statistics
         keep_logging('START: Generating Statistics Reports', 'START: Generating Statistics Reports', logger, 'info')
         alignment_stats_file = alignment_stats(out_sorted_bam, args.output_folder, args.analysis_name, logger, Config)
-        #gatk_DepthOfCoverage(out_sorted_bam, args.output_folder, args.analysis_name, reference, logger, Config)
+        gatk_DepthOfCoverage(out_sorted_bam, args.output_folder, args.analysis_name, reference, logger, Config)
         vcf_stats_file = vcf_stats(final_raw_vcf, args.output_folder, args.analysis_name, logger, Config)
         #qualimap_report = qualimap(out_sorted_bam, args.output_folder, args.analysis_name, logger, Config)
         keep_logging('END: Generating Statistics Reports', 'END: Generating Statistics Reports', logger, 'info')
 
-    # ################################################### Stages: Remove Unwanted Intermediate files ######################################
-    # # print "Removing Imtermediate Files...\n%s" % files_to_delete
-    # # for files in files_to_delete:
-    # #     os.remove(files)
-    # # print "Removing Imtermediate Files...\n%s" % files_to_delete
-    # # for files in files_to_delete:
-    # #     os.remove(files)
-    # ############################################################################ End ####################################################
+        # ################################################### Stages: Remove Unwanted Intermediate files ######################################
+        # # print "Removing Imtermediate Files...\n%s" % files_to_delete
+        # # for files in files_to_delete:
+        # #     os.remove(files)
+        # # print "Removing Imtermediate Files...\n%s" % files_to_delete
+        # # for files in files_to_delete:
+        # #     os.remove(files)
+        # ############################################################################ End ####################################################
 
 
-    if len(steps_list) == 1:
-        if steps_list[0] == "coverage_depth_stats":
-            clean()
-            out_sam = align_reads()
-            out_sorted_bam = post_align()
-            gatk_DepthOfCoverage_file = coverage_depth_stats()
 
-        elif steps_list[0] == "All":
-            clean()
-            out_sam = align_reads()
-            out_sorted_bam = post_align()
-            out_sorted_bam = "%s/%s_aln_sort.bam" % (args.output_folder, args.analysis_name)
-            gatk_depth_of_coverage_file = "%s/%s_depth_of_coverage.sample_summary" % (args.output_folder, args.analysis_name)
-            if not os.path.exists(gatk_depth_of_coverage_file):
-                gatk_depth_of_coverage_file = coverage_depth_stats()
-            final_raw_vcf = varcall()
-            final_raw_vcf = "%s/%s_aln_mpileup_raw.vcf_5bp_indel_removed.vcf" % (args.output_folder, args.analysis_name)
-            filter(gatk_depth_of_coverage_file)
-            stats()
 
-        #####Individual steps
-    else:
 
-        if steps_list[0] == "clean":
-            clean()
-            out_sam = align_reads()
-            out_sorted_bam = post_align()
-            #out_sorted_bam = "%s/%s_aln_sort.bam" % (args.output_folder, args.analysis_name)
-            gatk_depth_of_coverage_file = "%s/%s_depth_of_coverage.sample_summary" % (args.output_folder, args.analysis_name)
-            if not os.path.exists(gatk_depth_of_coverage_file):
-                gatk_depth_of_coverage_file = coverage_depth_stats()
-            final_raw_vcf = varcall()
-            #final_raw_vcf = "%s/%s_aln_mpileup_raw.vcf_5bp_indel_removed.vcf" % (args.output_folder, args.analysis_name)
-            filter(gatk_depth_of_coverage_file)
-            stats()
-        elif steps_list[0] == "align":
-            #Check clean reads here
-            out_sam = align_reads()
-            out_sorted_bam = post_align()
-            #out_sorted_bam = "%s/%s_aln_sort.bam" % (args.output_folder, args.analysis_name)
-            gatk_depth_of_coverage_file = "%s/%s_depth_of_coverage.sample_summary" % (args.output_folder, args.analysis_name)
-            if not os.path.exists(gatk_depth_of_coverage_file):
-                gatk_depth_of_coverage_file = coverage_depth_stats()
-            final_raw_vcf = varcall()
-            #final_raw_vcf = "%s/%s_aln_mpileup_raw.vcf_5bp_indel_removed.vcf" % (args.output_folder, args.analysis_name)
-            filter(gatk_depth_of_coverage_file)
-            stats()
-        elif steps_list[0] == "post-align":
-            #Check BAM file here
-            out_sorted_bam = post_align()
-            #out_sorted_bam = "%s/%s_aln_sort.bam" % (args.output_folder, args.analysis_name)
-            gatk_depth_of_coverage_file = "%s/%s_depth_of_coverage.sample_summary" % (args.output_folder, args.analysis_name)
-            if not os.path.exists(gatk_depth_of_coverage_file):
-                gatk_depth_of_coverage_file = coverage_depth_stats()
-            final_raw_vcf = varcall()
-            #final_raw_vcf = "%s/%s_aln_mpileup_raw.vcf_5bp_indel_removed.vcf" % (args.output_folder, args.analysis_name)
-            filter(gatk_depth_of_coverage_file)
-            stats()
 
-        elif steps_list[0] == "varcall":
-            #Check Post-aligned-BAM and Bed files here
-            out_sorted_bam = "%s/%s_aln_sort.bam" % (args.output_folder, args.analysis_name)
-            gatk_depth_of_coverage_file = "%s/%s_depth_of_coverage.sample_summary" % (args.output_folder, args.analysis_name)
-            if not os.path.exists(gatk_depth_of_coverage_file):
-                gatk_depth_of_coverage_file = coverage_depth_stats()
-            final_raw_vcf = varcall()
-            #final_raw_vcf = "%s/%s_aln_mpileup_raw.vcf_5bp_indel_removed.vcf" % (args.output_folder, args.analysis_name)
-            filter(gatk_depth_of_coverage_file)
-            stats()
 
-        elif steps_list[0] == "filter":
-            #Check Post-varcall vcf and other files here
-            out_sorted_bam = "%s/%s_aln_sort.bam" % (args.output_folder, args.analysis_name)
-            gatk_depth_of_coverage_file = "%s/%s_depth_of_coverage.sample_summary" % (args.output_folder, args.analysis_name)
-            if not os.path.exists(gatk_depth_of_coverage_file):
-                gatk_depth_of_coverage_file = coverage_depth_stats()
-            final_raw_vcf = "%s/%s_aln_mpileup_raw.vcf_5bp_indel_removed.vcf" % (args.output_folder, args.analysis_name)
-            filter(gatk_depth_of_coverage_file)
-            stats()
-        elif steps_list[0] == "stats":
-            #check BAM and vcf files
-            gatk_depth_of_coverage_file = "%s/%s_depth_of_coverage.sample_summary" % (args.output_folder, args.analysis_name)
-            if not os.path.exists(gatk_depth_of_coverage_file):
-                gatk_depth_of_coverage_file = coverage_depth_stats()
-            out_sorted_bam = "%s/%s_aln_sort.bam" % (args.output_folder, args.analysis_name)
-            final_raw_vcf = "%s/%s_aln_mpileup_raw.vcf_5bp_indel_removed.vcf" % (args.output_folder, args.analysis_name)
-
-            stats()
-
-        else:
-            keep_logging('Seems like the Analysis Steps are not in sequential order. Please recheck the -steps argument and run the pipeline again', 'Seems like the Analysis Steps are not in sequential order. Please recheck the -steps argument and run the pipeline again', logger, 'exception')
 
 
 ## Check Subroutines
@@ -418,25 +308,17 @@ def picard_seqdict(dict_name, reference):
         sys.exit(1)
 
 
-
-
-
-
-
-
 ###
 
 # Main Method
 if __name__ == '__main__':
-    print "here"
     start_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    start_time_2 = datetime.now()
     args = parser().parse_args()
     global config_file
     if args.config:
         config_file = args.config
     else:
-        config_file = os.path.dirname(os.path.abspath(__file__)) + "/config"
+        config_file = "./config"
     global logger
     if args.output_folder != '':
         args.output_folder += '/'
@@ -444,12 +326,7 @@ if __name__ == '__main__':
     log_unique_time = datetime.now().strftime('%Y_%m_%d_%H_%M_%S')
     logger = generate_logger(args.output_folder, args.analysis_name, log_unique_time)
     global Config
-    global files_to_delete
-    files_to_delete = []
     Config = ConfigParser.ConfigParser()
     Config.read(config_file)
     pipeline(args, logger)
     keep_logging('End: Pipeline', 'End: Pipeline', logger, 'info')
-    time_taken = datetime.now() - start_time_2
-    keep_logging('Total Time taken: {}'.format(time_taken), 'Total Time taken: {}'.format(time_taken), logger, 'info')
-

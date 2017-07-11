@@ -13,6 +13,9 @@ binbase: /home/apirani/bin/
 
 ########################################################################################################################
 
+[cluster]
+cluster_resources: #PBS -l nodes=1:ppn=4,mem=4000mb,walltime=24:00:00
+
 # Set Parameters for individual tools. Set the binbase of each tool: This should be the folder name of respective tools where the executables for each resp. tool resides.
 # Set parameter for Trimmomatic
 [Trimmomatic]
@@ -26,7 +29,7 @@ minadapterlength: 8
 #change this to true and see the effect on alignment
 keep_both_reads: true
 window_size: 4
-window_size_quality: 20
+window_size_quality: 15
 minlength: 40
 headcrop_length: 0
 colon: :
@@ -70,11 +73,35 @@ gatk_bin: /GenomeAnalysisTK-3.3-0/
 base_cmd: GenomeAnalysisTK.jar
 haplotype_parameters: -T HaplotypeCaller --genotyping_mode DISCOVERY
 #changes: 12th August
-gatk_filter1_parameter_expression = FQ < 40.00 && MQ > 20 && QUAL > 50 && DP > 15
-gatk_filter2_parameter_expression = FQ < 0.025 && MQ > 50 && QUAL > 100 && DP > 15
+gatk_filter1_parameter_expression: FQ < 40.00 && MQ > 20 && QUAL > 50 && DP > 15
+gatk_filter2_parameter_expression: FQ < 0.025 && MQ > 50 && QUAL > 100 && DP > 15
 #changed gatk_filter2_parameter_expression DP 15 from 10 that was used in VRE samples.
 
+[SNP_filters]
+filter_criteria: snitkin_filters
+# Other Criterias: SPANDx_filters, loose_filters, snitkin_filters
 
+[snitkin_filters]
+avg_depth: no
+# If AVG_DEPTH is yes, the below DP threshold will be ignored. Instead, LOW_DEPTH and HIGH_DEPTH filter parameter will be used.
+# Filter variants with Depth less than the below threshold
+dp: 9
+# A value of 2 means that regions with less than half of the average coverage of the entire genome will fail
+low_depth: 2
+# A value of 5 means that regions with 5x depth greater than the average coverage will fail
+high_depth: 5
+# Filter variants with FQ(Consensus Quality) greater than the below threshold
+fq: 0.025
+# Filter variants with MQ(Root Mean Square Quality) less than the below threshold
+mq: 50
+# Filter variants with Variant QUAL less than the below threshold
+qual: 100
+#CLUSTER_SNP: 3
+#CLUSTER_WINDOW_SNP: 10
+#MLEAF_SNP: 0.95
+#QD_SNP: 10.0
+#FS_SNP: 10.0
+#HAPLO_SNP: 20.0
 
 
 [vcftools]
@@ -124,6 +151,12 @@ Ref_Name: KPNIH1.fasta
 # path to the reference genome fasta file.
 Ref_Path: /home/apirani/bin/reference/KPNIH1/
 
+[KPC_264]
+# Name of reference genome fasta file.
+Ref_Name: Rush_KPC_264_contigs_ordered.fasta
+# path to the reference genome fasta file.
+Ref_Path: /home/apirani/bin/reference/KPC_264/
+
 
 # Name of the reference genome. Provide this value with -index_name argument.
 [KPNIH32]
@@ -132,6 +165,7 @@ Ref_Name: KPNIH32.fasta
 # path to the reference genome fasta file.
 Ref_Path: /Users/alipirani/Documents/bin/bin_varcall/reference//KPNIH32/
 
+## Efaecalis and Efaecium Reference Genomes
 
 # Name of the reference genome. Provide this value with -index_name argument.
 [aus]
@@ -140,7 +174,6 @@ Ref_Name: Efae_aus0004_genome.fa
 # path to the reference genome fasta file.
 Ref_Path: /home/apirani/bin/reference/aus/
 
-
 # Name of the reference genome. Provide this value with -index_name argument.
 [EPI51]
 # Name of reference genome fasta file.
@@ -148,14 +181,12 @@ Ref_Name: Efae_EPI51_060509_genome.fa
 # path to the reference genome fasta file.
 Ref_Path: /home/apirani/bin/reference/EPI51/
 
-
 # Name of the reference genome. Provide this value with -index_name argument.
 [EnGen0178]
 # Name of reference genome fasta file.
 Ref_Name: EnGen0178_genome.fa
 # path to the reference genome fasta file.
 Ref_Path: /home/apirani/bin/reference/EnGen0178/
-
 
 # Name of the reference genome. Provide this value with -index_name argument.
 [EnGen0377]
@@ -176,11 +207,32 @@ Ref_Name: ECNIH2.fa
 # path to the reference genome fasta file.
 Ref_Path: /home/apirani/bin/reference//ECNIH2/
 
+[Efaecalis_V583]
+# Name of reference genome fasta file.
+Ref_Name: Efaecalis_V583.fasta
+# path to the reference genome fasta file.
+Ref_Path: /home/apirani/bin/reference//Efaecalis_V583//
+
+[Efaecium_Aus0085]
+# Name of reference genome fasta file.
+Ref_Name: Efaecium_Aus0085.fasta
+# path to the reference genome fasta file.
+Ref_Path: /home/apirani/bin/reference//Efaecium_Aus0085/
+
+
+
+## MRSA Reference Genomes
 [MRSA_USA_300]
 # Name of reference genome fasta file.
 Ref_Name: MRSA_USA_300.fasta
 # path to the reference genome fasta file.
 Ref_Path: /home/apirani/bin/reference/MRSA_USA_300/
+
+[MRSA_USA_100]
+# Name of reference genome fasta file.
+Ref_Name: MRSA_USA_100_1.fasta
+# path to the reference genome fasta file.
+Ref_Path: /home/apirani/bin/reference/MRSA_USA_100/
 
 [MRSA_8058]
 # Name of reference genome fasta file.
@@ -218,6 +270,9 @@ Ref_Name: KP_mrsa_41.fasta
 # path to the reference genome fasta file.
 Ref_Path: /nfs/esnitkin/Ali/Project_MRSA_analysis/ISmapper/2016_04_19_analysis_2/KP_mrsa_41_analysis/
 
+
+
+## Cdiff Reference Genomes
 
 [H102]
 # Name of reference genome fasta file.
@@ -343,12 +398,19 @@ Ref_Name: Rush_KPC_653_R1_l500_contigs.fasta
 # path to the reference genome fasta file.
 Ref_Path: /nfs/esnitkin/Ali/Project_KPC_LTACH_analysis/Analysis/Project_KPC_all_KPC_2008+Hiseq+Latest/2017-01-17-Variant-Calling_Strain_Specific/data/reference/
 
+##Ecoli Reference Genomes
+
 [CFT073]
 # Name of reference genome fasta file.
 Ref_Name: EscherichiacoliCFT073.fna
 # path to the reference genome fasta file.
 Ref_Path: /home/apirani/bin/reference/CFT073
 
+[Ecoli_CD306]
+# Name of reference genome fasta file.
+Ref_Name: Ecoli_CD306.fasta
+# path to the reference genome fasta file.
+Ref_Path: /home/apirani/bin/reference/Ecoli_CD306
 
 
 
@@ -365,4 +427,118 @@ Ref_Path: /home/apirani/bin/reference/CFT073
 
 
 
+#RNA Seq Reference Genomes
 
+[HM14]
+# Name of reference genome fasta file.
+Ref_Name: HM14.fasta
+# path to the reference genome fasta file.
+Ref_Path: /nfs/esnitkin/Ali/Project_RNA_seq/Reference_genomes/
+
+[HM17]
+# Name of reference genome fasta file.
+Ref_Name: HM17.fasta       
+# path to the reference genome fasta file.
+Ref_Path: /nfs/esnitkin/Ali/Project_RNA_seq/Reference_genomes/
+
+[HM1]
+# Name of reference genome fasta file.
+Ref_Name: HM1.fasta
+# path to the reference genome fasta file.
+Ref_Path: /nfs/esnitkin/Ali/Project_RNA_seq/Reference_genomes/
+
+[HM26]
+# Name of reference genome fasta file.
+Ref_Name: HM26.fasta
+# path to the reference genome fasta file.
+Ref_Path: /nfs/esnitkin/Ali/Project_RNA_seq/Reference_genomes/
+
+[HM27]
+# Name of reference genome fasta file.
+Ref_Name: HM27.fasta
+# path to the reference genome fasta file.
+Ref_Path: /nfs/esnitkin/Ali/Project_RNA_seq/Reference_genomes/
+
+[HM3]
+# Name of reference genome fasta file.
+Ref_Name: HM3.fasta
+# path to the reference genome fasta file.
+Ref_Path: /nfs/esnitkin/Ali/Project_RNA_seq/Reference_genomes/
+
+[HM43]
+# Name of reference genome fasta file.
+Ref_Name: HM43.fasta                  
+# path to the reference genome fasta file.
+Ref_Path: /nfs/esnitkin/Ali/Project_RNA_seq/Reference_genomes/
+
+[HM46]
+# Name of reference genome fasta file.
+Ref_Name: HM46.fasta                 
+# path to the reference genome fasta file.
+Ref_Path: /nfs/esnitkin/Ali/Project_RNA_seq/Reference_genomes/
+
+[HM54]
+# Name of reference genome fasta file.
+Ref_Name: HM54.fasta                 
+# path to the reference genome fasta file.
+Ref_Path: /nfs/esnitkin/Ali/Project_RNA_seq/Reference_genomes/
+
+[HM56]
+# Name of reference genome fasta file.
+Ref_Name: HM56.fasta                  
+# path to the reference genome fasta file.
+Ref_Path: /nfs/esnitkin/Ali/Project_RNA_seq/Reference_genomes/
+
+[HM57]
+# Name of reference genome fasta file.
+Ref_Name: HM57.fasta                  
+# path to the reference genome fasta file.
+Ref_Path: /nfs/esnitkin/Ali/Project_RNA_seq/Reference_genomes/
+
+[HM60]
+# Name of reference genome fasta file.
+Ref_Name: HM60.fasta                  
+# path to the reference genome fasta file.
+Ref_Path: /nfs/esnitkin/Ali/Project_RNA_seq/Reference_genomes/
+
+[HM65]
+# Name of reference genome fasta file.
+Ref_Name: HM65.fasta                  
+# path to the reference genome fasta file.
+Ref_Path: /nfs/esnitkin/Ali/Project_RNA_seq/Reference_genomes/
+
+[HM66]
+# Name of reference genome fasta file.
+Ref_Name: HM66.fasta                 
+# path to the reference genome fasta file.
+Ref_Path: /nfs/esnitkin/Ali/Project_RNA_seq/Reference_genomes/
+
+[HM67]
+# Name of reference genome fasta file.
+Ref_Name: HM67.fasta
+# path to the reference genome fasta file.
+Ref_Path: /nfs/esnitkin/Ali/Project_RNA_seq/Reference_genomes/
+
+[HM68]
+# Name of reference genome fasta file.
+Ref_Name: HM68.fasta
+# path to the reference genome fasta file.
+Ref_Path: /nfs/esnitkin/Ali/Project_RNA_seq/Reference_genomes/
+
+[HM6]
+# Name of reference genome fasta file.
+Ref_Name: HM6.fasta
+# path to the reference genome fasta file.
+Ref_Path: /nfs/esnitkin/Ali/Project_RNA_seq/Reference_genomes/
+
+[HM7]
+# Name of reference genome fasta file.
+Ref_Name: HM7.fasta
+# path to the reference genome fasta file.
+Ref_Path: /nfs/esnitkin/Ali/Project_RNA_seq/Reference_genomes/
+
+[HM86]
+# Name of reference genome fasta file.
+Ref_Name: HM86.fasta
+# path to the reference genome fasta file.
+Ref_Path: /nfs/esnitkin/Ali/Project_RNA_seq/Reference_genomes/

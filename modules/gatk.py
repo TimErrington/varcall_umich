@@ -1,5 +1,5 @@
+from __future__ import division
 __author__ = 'alipirani'
-
 import os
 from config_settings import ConfigSectionMap
 from modules.samtools import *
@@ -58,9 +58,23 @@ def gatk_filter1(final_raw_vcf, out_path, analysis, reference):
 ############################################################### END #########################################################################################################################
 
 ############################################################### GATK: Variant Filtering #######################################################################################################
-def gatk_filter2(final_raw_vcf, out_path, analysis, reference, logger, Config):
+def gatk_filter2(final_raw_vcf, out_path, analysis, reference, logger, Config, Avg_dp):
     base_cmd = ConfigSectionMap("bin_path", Config)['binbase'] + "/" + ConfigSectionMap("gatk", Config)['gatk_bin'] + "/" + ConfigSectionMap("gatk", Config)['base_cmd']
-    gatk_filter2_parameter_expression = ConfigSectionMap("gatk", Config)['gatk_filter2_parameter_expression']
+    filter_criteria = ConfigSectionMap("SNP_filters", Config)['filter_criteria']
+    if ConfigSectionMap(filter_criteria, Config)['avg_depth'] == "yes":
+        print "The average depth filter is on."
+        low_Dp = float(Avg_dp) / 2
+        high_Dp = float(Avg_dp) * 5
+        DP_filter = "DP > %s && DP < %s" % (int(low_Dp), int(high_Dp))
+    else:
+        DP_filter = "DP > %s" % ConfigSectionMap(filter_criteria, Config)['dp']
+    MQ_filter = "MQ > %s" % ConfigSectionMap(filter_criteria, Config)['mq']
+    FQ_filter = "FQ < %s" % ConfigSectionMap(filter_criteria, Config)['fq']
+    QUAL_filter = "QUAL > %s" % ConfigSectionMap(filter_criteria, Config)['qual']
+
+    gatk_filter2_parameter_expression = "%s && %s && %s && %s" % (FQ_filter, MQ_filter, QUAL_filter, DP_filter)
+    #gatk_filter2_parameter_expression = ConfigSectionMap("gatk", Config)['gatk_filter2_parameter_expression']
+
     gatk_filter2_command = "java -jar %s -T VariantFiltration -R %s -o %s/%s_filter2_gatk.vcf --variant %s --filterExpression \"%s\" --filterName PASS_filter2" % (base_cmd, reference, out_path, analysis, final_raw_vcf, gatk_filter2_parameter_expression)
     filter_flag_command = "grep '#\|PASS_filter2' %s/%s_filter2_gatk.vcf > %s/%s_filter2_final.vcf" % (out_path, analysis, out_path, analysis)
     keep_logging(gatk_filter2_command, gatk_filter2_command, logger, 'debug')
@@ -132,7 +146,7 @@ def gatk_vcf2fasta_filter2(only_snp_filter2_vcf_file, out_path, analysis, refere
 ############################################################### GATK: DepthOfCoverage #######################################################################################################
 def gatk_DepthOfCoverage(out_sorted_bam, out_path, analysis_name, reference, logger, Config):
     base_cmd = ConfigSectionMap("bin_path", Config)['binbase'] + "/" + ConfigSectionMap("gatk", Config)['gatk_bin'] + "/" + ConfigSectionMap("gatk", Config)['base_cmd']
-    cmd = "java -jar %s -T DepthOfCoverage -R %s -o %s/%s_depth_of_coverage -I %s --summaryCoverageThreshold 15" % (base_cmd, reference, out_path, analysis_name, out_sorted_bam)
+    cmd = "java -jar %s -T DepthOfCoverage -R %s -o %s/%s_depth_of_coverage -I %s --summaryCoverageThreshold 5 --summaryCoverageThreshold 10 --summaryCoverageThreshold 15 --summaryCoverageThreshold 20 --summaryCoverageThreshold 25 --minBaseQuality 15" % (base_cmd, reference, out_path, analysis_name, out_sorted_bam)
     keep_logging(cmd, cmd, logger, 'debug')
     try:
         call(cmd, logger)
@@ -140,8 +154,9 @@ def gatk_DepthOfCoverage(out_sorted_bam, out_path, analysis_name, reference, log
     except sp.CalledProcessError:
         keep_logging('Error in GATK Depth of Coverage step. Exiting.', 'Error in GATK Depth of Coverage step. Exiting.', logger, 'exception')
         sys.exit(1)
-    gatk_depth_of_coverage_file = "%s/%s_depth_of_coverage" % (out_path, analysis_name)
+    gatk_depth_of_coverage_file = "%s/%s_depth_of_coverage.sample_summary" % (out_path, analysis_name)
     keep_logging('GATK Depth of Coverage file: {}'.format(gatk_depth_of_coverage_file), 'GATK Depth of Coverage file: {}'.format(gatk_depth_of_coverage_file), logger, 'debug')
+    return gatk_depth_of_coverage_file
 ############################################################### GATK: DepthOfCoverage #######################################################################################################
 
 
